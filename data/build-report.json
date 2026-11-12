@@ -1,0 +1,825 @@
+{
+  "fieldmapRecords": 792,
+  "pdfAcroFields": 748,
+  "controls": 573,
+  "noPdfField": 181,
+  "noPdfFieldBySection": {
+    "additional-info": 4,
+    "children-info": 1,
+    "biographic-info": 1,
+    "9a": 13,
+    "9b": 21,
+    "9c": 28,
+    "9e": 1,
+    "9f": 1
+  },
+  "piiExcluded": 88,
+  "piiByCat": {
+    "护照/证件号": 1,
+    "姓名": 37,
+    "A-Number": 4,
+    "地址": 33,
+    "子女个人信息": 4,
+    "电话": 6,
+    "邮箱": 3
+  },
+  "piiList": [
+    {
+      "id": "eoir_number",
+      "cat": "护照/证件号",
+      "section": "application-type"
+    },
+    {
+      "id": "principal_lastname",
+      "cat": "姓名",
+      "section": "application-type"
+    },
+    {
+      "id": "principal_firstname",
+      "cat": "姓名",
+      "section": "application-type"
+    },
+    {
+      "id": "principal_middlename",
+      "cat": "姓名",
+      "section": "application-type"
+    },
+    {
+      "id": "principal_a_number",
+      "cat": "A-Number",
+      "section": "application-type"
+    },
+    {
+      "id": "permanent_resident_city",
+      "cat": "地址",
+      "section": "additional-info"
+    },
+    {
+      "id": "permanent_resident_country",
+      "cat": "地址",
+      "section": "additional-info"
+    },
+    {
+      "id": "employer_street",
+      "cat": "地址",
+      "section": "additional-info"
+    },
+    {
+      "id": "employer_apt",
+      "cat": "地址",
+      "section": "additional-info"
+    },
+    {
+      "id": "employer_ste",
+      "cat": "地址",
+      "section": "additional-info"
+    },
+    {
+      "id": "employer_flr",
+      "cat": "地址",
+      "section": "additional-info"
+    },
+    {
+      "id": "employer_number",
+      "cat": "地址",
+      "section": "additional-info"
+    },
+    {
+      "id": "employer_city",
+      "cat": "地址",
+      "section": "additional-info"
+    },
+    {
+      "id": "employer_state",
+      "cat": "地址",
+      "section": "additional-info"
+    },
+    {
+      "id": "employer_zip",
+      "cat": "地址",
+      "section": "additional-info"
+    },
+    {
+      "id": "employer_province",
+      "cat": "地址",
+      "section": "additional-info"
+    },
+    {
+      "id": "employer_postal",
+      "cat": "地址",
+      "section": "additional-info"
+    },
+    {
+      "id": "employer_country",
+      "cat": "地址",
+      "section": "additional-info"
+    },
+    {
+      "id": "outside_employer_street",
+      "cat": "地址",
+      "section": "additional-info"
+    },
+    {
+      "id": "outside_employer_apt",
+      "cat": "地址",
+      "section": "additional-info"
+    },
+    {
+      "id": "outside_employer_ste",
+      "cat": "地址",
+      "section": "additional-info"
+    },
+    {
+      "id": "outside_employer_flr",
+      "cat": "地址",
+      "section": "additional-info"
+    },
+    {
+      "id": "outside_employer_city",
+      "cat": "地址",
+      "section": "additional-info"
+    },
+    {
+      "id": "outside_employer_state",
+      "cat": "地址",
+      "section": "additional-info"
+    },
+    {
+      "id": "outside_employer_province",
+      "cat": "地址",
+      "section": "additional-info"
+    },
+    {
+      "id": "outside_employer_postal",
+      "cat": "地址",
+      "section": "additional-info"
+    },
+    {
+      "id": "outside_employer_country",
+      "cat": "地址",
+      "section": "additional-info"
+    },
+    {
+      "id": "parentone_lastname",
+      "cat": "姓名",
+      "section": "parent-info"
+    },
+    {
+      "id": "parentone_firstname",
+      "cat": "姓名",
+      "section": "parent-info"
+    },
+    {
+      "id": "parentone_middlename",
+      "cat": "姓名",
+      "section": "parent-info"
+    },
+    {
+      "id": "parentone_birth_lastname",
+      "cat": "姓名",
+      "section": "parent-info"
+    },
+    {
+      "id": "parentone_birth_firstname",
+      "cat": "姓名",
+      "section": "parent-info"
+    },
+    {
+      "id": "parentone_birth_middlename",
+      "cat": "姓名",
+      "section": "parent-info"
+    },
+    {
+      "id": "parentone_dob",
+      "cat": "姓名",
+      "section": "parent-info"
+    },
+    {
+      "id": "parentone_country",
+      "cat": "姓名",
+      "section": "parent-info"
+    },
+    {
+      "id": "parenttwo_lastname",
+      "cat": "姓名",
+      "section": "parent-info"
+    },
+    {
+      "id": "parenttwo_firstname",
+      "cat": "姓名",
+      "section": "parent-info"
+    },
+    {
+      "id": "parenttwo_middlename",
+      "cat": "姓名",
+      "section": "parent-info"
+    },
+    {
+      "id": "parenttwo_birth_lastname",
+      "cat": "姓名",
+      "section": "parent-info"
+    },
+    {
+      "id": "parenttwo_birth_firstname",
+      "cat": "姓名",
+      "section": "parent-info"
+    },
+    {
+      "id": "parenttwo_birth_middlename",
+      "cat": "姓名",
+      "section": "parent-info"
+    },
+    {
+      "id": "parenttwo_dob",
+      "cat": "姓名",
+      "section": "parent-info"
+    },
+    {
+      "id": "parenttwo_country",
+      "cat": "姓名",
+      "section": "parent-info"
+    },
+    {
+      "id": "currentspouse_lastname",
+      "cat": "姓名",
+      "section": "marital-history"
+    },
+    {
+      "id": "currentspouse_firstname",
+      "cat": "姓名",
+      "section": "marital-history"
+    },
+    {
+      "id": "currentspouse_middlename",
+      "cat": "姓名",
+      "section": "marital-history"
+    },
+    {
+      "id": "currentspouse_anumber",
+      "cat": "A-Number",
+      "section": "marital-history"
+    },
+    {
+      "id": "currentspouse_street",
+      "cat": "地址",
+      "section": "marital-history"
+    },
+    {
+      "id": "currentspouse_apt",
+      "cat": "地址",
+      "section": "marital-history"
+    },
+    {
+      "id": "currentspouse_ste",
+      "cat": "地址",
+      "section": "marital-history"
+    },
+    {
+      "id": "currentspouse_flr",
+      "cat": "地址",
+      "section": "marital-history"
+    },
+    {
+      "id": "currentspouse_number",
+      "cat": "地址",
+      "section": "marital-history"
+    },
+    {
+      "id": "currentspouse_city",
+      "cat": "地址",
+      "section": "marital-history"
+    },
+    {
+      "id": "currentspouse_state",
+      "cat": "地址",
+      "section": "marital-history"
+    },
+    {
+      "id": "currentspouse_zip",
+      "cat": "地址",
+      "section": "marital-history"
+    },
+    {
+      "id": "currentspouse_province",
+      "cat": "地址",
+      "section": "marital-history"
+    },
+    {
+      "id": "currentspouse_postal",
+      "cat": "地址",
+      "section": "marital-history"
+    },
+    {
+      "id": "currentspouse_country",
+      "cat": "地址",
+      "section": "marital-history"
+    },
+    {
+      "id": "priorspouse_lastname",
+      "cat": "姓名",
+      "section": "marital-history"
+    },
+    {
+      "id": "priorspouse_firstname",
+      "cat": "姓名",
+      "section": "marital-history"
+    },
+    {
+      "id": "priorspouse_middlename",
+      "cat": "姓名",
+      "section": "marital-history"
+    },
+    {
+      "id": "childone_lastname",
+      "cat": "姓名",
+      "section": "children-info"
+    },
+    {
+      "id": "childone_firstname",
+      "cat": "姓名",
+      "section": "children-info"
+    },
+    {
+      "id": "childone_middlename",
+      "cat": "姓名",
+      "section": "children-info"
+    },
+    {
+      "id": "childone_a_number",
+      "cat": "A-Number",
+      "section": "children-info"
+    },
+    {
+      "id": "childone_dob",
+      "cat": "子女个人信息",
+      "section": "children-info"
+    },
+    {
+      "id": "childone_country",
+      "cat": "子女个人信息",
+      "section": "children-info"
+    },
+    {
+      "id": "childtwo_lastname",
+      "cat": "姓名",
+      "section": "children-info"
+    },
+    {
+      "id": "childtwo_firstname",
+      "cat": "姓名",
+      "section": "children-info"
+    },
+    {
+      "id": "childtwo_middlename",
+      "cat": "姓名",
+      "section": "children-info"
+    },
+    {
+      "id": "childtwo_a_number",
+      "cat": "A-Number",
+      "section": "children-info"
+    },
+    {
+      "id": "childtwo_dob",
+      "cat": "子女个人信息",
+      "section": "children-info"
+    },
+    {
+      "id": "childtwo_country",
+      "cat": "子女个人信息",
+      "section": "children-info"
+    },
+    {
+      "id": "applicant_telephone",
+      "cat": "电话",
+      "section": "applicant-info"
+    },
+    {
+      "id": "applicant_mobile",
+      "cat": "电话",
+      "section": "applicant-info"
+    },
+    {
+      "id": "applicant_email",
+      "cat": "邮箱",
+      "section": "applicant-info"
+    },
+    {
+      "id": "interpreter_lastname",
+      "cat": "姓名",
+      "section": "interpreter-info"
+    },
+    {
+      "id": "interpreter_firstname",
+      "cat": "姓名",
+      "section": "interpreter-info"
+    },
+    {
+      "id": "interpreter_businessname",
+      "cat": "姓名",
+      "section": "interpreter-info"
+    },
+    {
+      "id": "interpreter_telephone",
+      "cat": "电话",
+      "section": "interpreter-info"
+    },
+    {
+      "id": "interpreter_mobile",
+      "cat": "电话",
+      "section": "interpreter-info"
+    },
+    {
+      "id": "interpreter_email",
+      "cat": "邮箱",
+      "section": "interpreter-info"
+    },
+    {
+      "id": "preparer_lastname",
+      "cat": "姓名",
+      "section": "preparer-info"
+    },
+    {
+      "id": "preparer_firstname",
+      "cat": "姓名",
+      "section": "preparer-info"
+    },
+    {
+      "id": "preparer_businessname",
+      "cat": "姓名",
+      "section": "preparer-info"
+    },
+    {
+      "id": "preparer_telephone",
+      "cat": "电话",
+      "section": "preparer-info"
+    },
+    {
+      "id": "preparer_mobile",
+      "cat": "电话",
+      "section": "preparer-info"
+    },
+    {
+      "id": "preparer_email",
+      "cat": "邮箱",
+      "section": "preparer-info"
+    }
+  ],
+  "conditionalQuestions": 66,
+  "excludedSections": [
+    "info-about-you"
+  ],
+  "excludedBySection": {
+    "info-about-you": 108
+  },
+  "excludedControls": 108,
+  "danglingConditions": [],
+  "questions": 173,
+  "bySection": {
+    "application-type": 21,
+    "request-for-exemption": 1,
+    "additional-info": 14,
+    "marital-history": 16,
+    "children-info": 5,
+    "biographic-info": 6,
+    "9a": 23,
+    "9b": 21,
+    "9c": 28,
+    "9d": 14,
+    "9e": 7,
+    "9f": 6,
+    "9g": 10,
+    "interpreter-info": 1
+  },
+  "oneOf": 2,
+  "unresolvedConditions": [],
+  "itemsWithoutZh": [],
+  "titleZh": {
+    "tableEntries": 59,
+    "appliedFromTable": 59,
+    "withZh": 173,
+    "total": 173,
+    "missing": [],
+    "orphanKeys": [],
+    "byKind": {
+      "B": 23,
+      "C": 4,
+      "A": 32
+    }
+  },
+  "hintZh": 173,
+  "missingHints": [],
+  "detailsField": 65,
+  "titleZhRewritten": 49,
+  "gatesChildren": [
+    {
+      "id": "application-type|r:i485_role",
+      "section": "application-type",
+      "item": "",
+      "noPdf": false,
+      "refs": [
+        "i485_derivative"
+      ]
+    },
+    {
+      "id": "application-type|gate:item3",
+      "section": "application-type",
+      "item": "3",
+      "noPdf": true,
+      "refs": [
+        "gate_family",
+        "gate_none",
+        "gate_employment",
+        "gate_special",
+        "gate_refugee",
+        "gate_humanitarian",
+        "gate_program",
+        "gate_additional"
+      ]
+    },
+    {
+      "id": "application-type|r:employment_i140_relative",
+      "section": "application-type",
+      "item": "3",
+      "noPdf": false,
+      "refs": [
+        "employment_i140_yes"
+      ]
+    },
+    {
+      "id": "application-type|r:asylee_refugee_type",
+      "section": "application-type",
+      "item": "3",
+      "noPdf": false,
+      "refs": [
+        "asylum_status",
+        "refugee_status"
+      ]
+    },
+    {
+      "id": "application-type|r:additional_option_type",
+      "section": "application-type",
+      "item": "3",
+      "noPdf": false,
+      "refs": [
+        "additionaloption_diversity",
+        "additionaloption_other"
+      ]
+    },
+    {
+      "id": "additional-info|r:permanent_resident_applied",
+      "section": "additional-info",
+      "item": "1",
+      "noPdf": false,
+      "refs": [
+        "permanent_resident_yes"
+      ]
+    },
+    {
+      "id": "marital-history|r:marital_status",
+      "section": "marital-history",
+      "item": "1",
+      "noPdf": false,
+      "refs": [
+        "maritialstatus_married",
+        "maritialstatus_seperated"
+      ]
+    },
+    {
+      "id": "marital-history|t:maritialstatus|3. How many times have you been married (including your current marriage, marriages abroad, annulled marriages, and marriages to the same person)?|",
+      "section": "marital-history",
+      "item": "3",
+      "noPdf": false,
+      "refs": [
+        "maritialstatus_marriage_number"
+      ]
+    },
+    {
+      "id": "marital-history|r:priorspouse_ended",
+      "section": "marital-history",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "priorspouse_ended_other"
+      ]
+    },
+    {
+      "id": "children-info|t:number|1. Children|Indicate the total number of ALL living children anywhere in the world (including adult sons and daughters) that you have",
+      "section": "children-info",
+      "item": "1",
+      "noPdf": false,
+      "refs": [
+        "number_children"
+      ]
+    },
+    {
+      "id": "9a|r:org",
+      "section": "9a",
+      "item": "1",
+      "noPdf": false,
+      "refs": [
+        "org_yes"
+      ]
+    },
+    {
+      "id": "9a|r:j_nonimmigrant",
+      "section": "9a",
+      "item": "19",
+      "noPdf": false,
+      "refs": [
+        "j_nonimmigrant_yes"
+      ]
+    },
+    {
+      "id": "9a|r:foreign_residence",
+      "section": "9a",
+      "item": "20",
+      "noPdf": false,
+      "refs": [
+        "foreign_residence_no"
+      ]
+    },
+    {
+      "id": "9b|r:spouse_traffick_illegal",
+      "section": "9b",
+      "item": "28",
+      "noPdf": false,
+      "refs": [
+        "spouse_traffick_illegal_yes"
+      ]
+    },
+    {
+      "id": "9b|r:served_foreign",
+      "section": "9b",
+      "item": "35.a",
+      "noPdf": false,
+      "refs": [
+        "served_foreign_yes"
+      ]
+    },
+    {
+      "id": "9b|r:spouse_traffick",
+      "section": "9b",
+      "item": "39",
+      "noPdf": false,
+      "refs": [
+        "spouse_traffick_yes"
+      ]
+    },
+    {
+      "id": "9d|r:public_charge_exempt",
+      "section": "9d",
+      "item": "56",
+      "noPdf": false,
+      "refs": [
+        "exempt_nope"
+      ]
+    },
+    {
+      "id": "9d|r:school_level",
+      "section": "9d",
+      "item": "61",
+      "noPdf": false,
+      "refs": [
+        "school_less_diploma"
+      ]
+    },
+    {
+      "id": "9d|r:ssi_needy",
+      "section": "9d",
+      "item": "63",
+      "noPdf": false,
+      "refs": [
+        "ssi_needy_yes"
+      ]
+    },
+    {
+      "id": "9f|r:unlawful_present",
+      "section": "9f",
+      "item": "74",
+      "noPdf": false,
+      "refs": [
+        "unlawful_present_yes"
+      ]
+    },
+    {
+      "id": "9g|r:evade_training",
+      "section": "9g",
+      "item": "83",
+      "noPdf": false,
+      "refs": [
+        "evade_training_yes"
+      ]
+    }
+  ],
+  "optionZh": {
+    "tableEntries": 155,
+    "total": 355,
+    "withZh": 355,
+    "missing": [],
+    "orphanKeys": []
+  },
+  "inputZh": {
+    "tableEntries": 84,
+    "total": 84,
+    "withZh": 84,
+    "missing": [],
+    "orphanKeys": []
+  },
+  "copyFix": {
+    "hintEntries": 168,
+    "hintApplied": 168,
+    "hintOrphanKeys": [],
+    "titleEntries": 45,
+    "titleApplied": 45,
+    "titleOrphanKeys": []
+  },
+  "handwrite": {
+    "totalFields": 315,
+    "parts": [
+      {
+        "id": "info-about-you",
+        "no": 1,
+        "count": 141
+      },
+      {
+        "id": "application-type",
+        "no": 2,
+        "count": 5
+      },
+      {
+        "id": "additional-info",
+        "no": 4,
+        "count": 22
+      },
+      {
+        "id": "parent-info",
+        "no": 5,
+        "count": 16
+      },
+      {
+        "id": "marital-history",
+        "no": 6,
+        "count": 18
+      },
+      {
+        "id": "children-info",
+        "no": 7,
+        "count": 12
+      },
+      {
+        "id": "biographic-info",
+        "no": 8,
+        "count": 3
+      },
+      {
+        "id": "9d",
+        "no": 9,
+        "count": 1
+      },
+      {
+        "id": "applicant-info",
+        "no": 10,
+        "count": 5
+      },
+      {
+        "id": "interpreter-info",
+        "no": 11,
+        "count": 8
+      },
+      {
+        "id": "preparer-info",
+        "no": 12,
+        "count": 8
+      },
+      {
+        "id": "additional-info-page",
+        "no": 14,
+        "count": 76
+      }
+    ],
+    "writtenAny": 431,
+    "structural": [
+      "meta_form_name",
+      "meta_formdata"
+    ]
+  },
+  "copyBulletsTotal": 77,
+  "copyBulletsUsed": 77,
+  "perSectionQuestions": {
+    "application-type": 21,
+    "request-for-exemption": 1,
+    "additional-info": 14,
+    "marital-history": 16,
+    "children-info": 5,
+    "biographic-info": 6,
+    "9a": 23,
+    "9b": 21,
+    "9c": 28,
+    "9d": 14,
+    "9e": 7,
+    "9f": 6,
+    "9g": 10,
+    "interpreter-info": 1
+  }
+}

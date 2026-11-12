@@ -1,0 +1,395 @@
+/* ============================================================
+   theme.css —— 颜色 + 结构轴唯一事实源（v9 批 5 · 2026-11-10）
+   ------------------------------------------------------------
+   ⚠ 本文件由 build/gen-theme.js 生成，请勿手改（改令牌表后重跑脚本）。
+
+   全站**唯一**允许出现颜色值的地方。
+   style.css 里 :root 之外的裸 hex = 0（验收 A12）；
+   app.js 里直写颜色 = 0（JS 里只写 var(--xxx) 引用）。
+
+   两层结构（这是「改一处三套同时生效」的实现方式）：
+     ① :root —— 每个角色令牌**只声明一次**，值是 var(--t-xxx)；
+        改这里的 --accent → 三套皮肤同时生效（验收 A7）。
+     ② html[data-theme="..."] —— 三套皮肤各自给 --t-xxx 填色值；
+        改这里的 --t-accent → 只那一套皮肤变。
+
+   三套皮肤：
+     shenqing    深青 —— 默认皮肤（老板 12:48 定：深青 #0F766E）
+     nuanzhu     暖朱 —— 纸感底色 + 收紧圆角
+     wenshu      文书 —— 近方角 + 藏青
+
+   主题 ↔ 12:10 定稿 mockup（唯一真相源，逐值照抄）：
+     shenqing → B-冷静工具   强调色 #0F766E 深绿（原 #1A56DB 蓝）
+     nuanzhu  → C-暖纸朱红   强调色 #246A88 湖蓝（原 #B33A2B 朱红）
+     wenshu   → A-文书质感   强调色 #1F3A5F 藏青（不变）
+   C 的 --fill（进度填充）与 --next-bg（主按钮底）按 mockup 保持墨色 #1B1B1F，
+   只有 --accent（标签 / 题号 / 悬停）走湖蓝。
+
+   背景大数字（批 5 新增）：A 左上 48px / B 右上 96px / C 不显示，
+   颜色与位置全部来自 mockup 的 .numeral 规则，逐值照抄。
+
+   ⚠ 语义色（危险 / 警告 / 成功）三套共用，不跟主题走。
+   ============================================================ */
+
+/* ---------- ① 角色令牌唯一声明层（改这里 → 三套同时生效） ---------- */
+:root {
+  --bg: var(--t-bg);        /* 页面底 */
+  --card: var(--t-card);    /* 卡片底 */
+  --ink: var(--t-ink);      /* 正文墨色 */
+  --muted: var(--t-muted);  /* 次要灰（说明文字 / 英文原文行） */
+  --line: var(--t-line);    /* 描边 */
+  --line-soft: var(--t-line-soft); /* 描边（悬停 / 强调边框） */
+  --line-neutral: var(--t-line-neutral); /* 中性描边（说明块左边线） */
+  --mark-line: var(--t-mark-line); /* 选项勾选框边框（对卡片底 ≥3:1，三套实测 3.19~3.51） */
+  --overlay: var(--t-overlay); /* 目录面板遮罩 */
+  --accent: var(--t-accent); /* 强调色（按钮底 / 链接 / 选中态边框） */
+  --accent-hover: var(--t-accent-hover); /* 强调色悬停 */
+  --accent-soft: var(--t-accent-soft); /* 强调浅底 */
+  --bar-done: var(--t-bar-done); /* 已走完的段（= fill 色） */
+  --bar-cur: var(--t-bar-cur); /* 当前段已填部分 */
+  --bar-track: var(--t-bar-track); /* 未走到的段底槽（= track 色） */
+  --ink-soft: var(--t-ink-soft); /* .lead 正文 */
+  --ink-mute: var(--t-ink-mute); /* 弱一级正文 */
+  --ink-faint: var(--t-ink-faint); /* 说明块正文 */
+  --ink-faint2: var(--t-ink-faint2); /* 输入框 label */
+  --ink-faint3: var(--t-ink-faint3); /* 更弱一级 */
+  --ink-faint4: var(--t-ink-faint4); /* 最弱（手填清单说明） */
+  --ink-faint5: var(--t-ink-faint5); /* 门题说明 */
+  --on-dark: var(--t-on-dark); /* 深底上的文字 */
+  --dark-bg: var(--t-dark-bg); /* 深色块（切段横幅 / toast） */
+  --sign: var(--t-sign);    /* 署名灰（12px 小字，按 WCAG AA 正文口径 ≥4.5:1：实测卡片底 4.93~5.79、页面底 4.60~5.50） */
+  --soft-gray: var(--t-soft-gray); /* 徽标底 / 目录悬停底 */
+  --soft-gray2: var(--t-soft-gray2); /* 说明块底 */
+  --soft-gray3: var(--t-soft-gray3); /* 选项悬停底 */
+  --soft-ok: var(--t-soft-ok); /* 成功徽标底 */
+  --soft-ok2: var(--t-soft-ok2); /* 目录「已答」徽标底 */
+  --soft-warn: var(--t-soft-warn); /* warning 底 */
+  --soft-warn2: var(--t-soft-warn2); /* warning 底（说明块用） */
+  --soft-danger: var(--t-soft-danger); /* 红档徽标底 */
+  --ok: var(--t-ok);        /* 成功色 */
+  --warn: var(--t-warn);    /* warning 文字色 */
+  --warn-border: var(--t-warn-border); /* warning 边框 / 竖条 */
+  --danger: var(--t-danger); /* 红档「可能影响资格」 */
+  --danger-ink: var(--t-danger-ink); /* 红档说明块正文 */
+  --tier3-line: var(--t-tier3-line); /* 档 3 左边线（灰） */
+  --dot-shenqing: var(--t-dot-shenqing); /* 色点：深青 */
+  --dot-nuanzhu: var(--t-dot-nuanzhu); /* 色点：暖朱 */
+  --dot-wenshu: var(--t-dot-wenshu); /* 色点：文书 */
+  --radius: var(--t-radius); /* 卡片圆角（= card-r） */
+  --radius-btn: var(--t-radius-btn); /* 按钮圆角（= btn-r） */
+  --radius-sm: var(--t-radius-sm); /* 小圆角 */
+  --radius-input: var(--t-radius-input); /* 输入框圆角（= opt-r） */
+  --radius-panel: var(--t-radius-panel); /* 面板圆角 */
+  --gap: var(--t-gap);      /* 段间距 */
+  --card-pad: var(--t-card-pad); /* 卡片内边距 */
+  --btn-h: var(--t-btn-h);  /* 主按钮高度 */
+  --title-font: var(--t-title-font); /* 标题字体族 */
+  --seg-h: var(--t-seg-h);  /* 进度条小节高 */
+  --seg-r: var(--t-seg-r);  /* 进度条小节圆角 */
+  --fill: var(--t-fill);    /* 进度填充色（C = 墨色） */
+  --track: var(--t-track);  /* 进度条底槽色 */
+  --band-h: var(--t-band-h); /* 顶栏横条高 */
+  --band: var(--t-band);    /* 顶栏横条色（B = 深绿浅底） */
+  --card-r: var(--t-card-r); /* 题卡圆角 */
+  --card-mt: var(--t-card-mt); /* 题卡距顶栏 */
+  --card-pad-t: var(--t-card-pad-t); /* 题卡上内边距 */
+  --card-pad-b: var(--t-card-pad-b); /* 题卡下内边距 */
+  --tag-bg: var(--t-tag-bg); /* 段标签底（B = 深绿浅底） */
+  --tag-fg: var(--t-tag-fg); /* 段标签字色 */
+  --tag-bd: var(--t-tag-bd); /* 段标签描边 */
+  --tag-r: var(--t-tag-r);  /* 段标签圆角 */
+  --qid-fg: var(--t-qid-fg); /* 题号色（C = 湖蓝） */
+  --opt-bg: var(--t-opt-bg); /* 选项底 */
+  --opt-bd: var(--t-opt-bd); /* 选项描边 */
+  --opt-r: var(--t-opt-r);  /* 选项圆角 */
+  --hint-bg: var(--t-hint-bg); /* 说明块底 */
+  --hint-bar: var(--t-hint-bar); /* 说明块左边线 */
+  --hint-r: var(--t-hint-r); /* 说明块圆角 */
+  --btn-r: var(--t-btn-r);  /* 按钮圆角 */
+  --prev-bg: var(--t-prev-bg); /* 上一题按钮底 */
+  --next-bg: var(--t-next-bg); /* 下一题按钮底（C = 墨色） */
+  --next-bg-hover: var(--t-next-bg-hover); /* 下一题按钮悬停底 */
+  --next-fg: var(--t-next-fg); /* 下一题按钮字色 */
+  --numeral-display: var(--t-numeral-display); /* 背景大数字显隐（C = 不渲染） */
+  --numeral-size: var(--t-numeral-size); /* 背景大数字字号 */
+  --numeral-lh: var(--t-numeral-lh); /* 背景大数字行高 */
+  --numeral-weight: var(--t-numeral-weight); /* 背景大数字字重 */
+  --numeral-ls: var(--t-numeral-ls); /* 背景大数字字距 */
+  --numeral-color: var(--t-numeral-color); /* 背景大数字颜色 */
+  --numeral-left: var(--t-numeral-left); /* 背景大数字左边距 */
+  --numeral-right: var(--t-numeral-right); /* 背景大数字右边距 */
+  --numeral-top: var(--t-numeral-top); /* 背景大数字上边距 */
+}
+
+/* ---------- ② 深青 （shenqing） ----------
+   默认皮肤（老板 12:48 定：深青 #0F766E） */
+html[data-theme="shenqing"] {
+  --t-bg: #F6F7F9;          /* 页面底 */
+  --t-card: #FFFFFF;        /* 卡片底 */
+  --t-ink: #12203A;         /* 正文墨色 */
+  --t-muted: #6E6E73;       /* 次要灰（说明文字 / 英文原文行） */
+  --t-line: #E5E7EB;        /* 描边 */
+  --t-line-soft: #C7D4EA;   /* 描边（悬停 / 强调边框） */
+  --t-line-neutral: #C7C7CC; /* 中性描边（说明块左边线） */
+  --t-mark-line: #7E8FAF;   /* 选项勾选框边框（对卡片底 ≥3:1，三套实测 3.19~3.51） */
+  --t-overlay: rgba(18, 32, 58, .45); /* 目录面板遮罩 */
+  --t-accent: #0F766E;      /* 强调色（按钮底 / 链接 / 选中态边框） */
+  --t-accent-hover: #0B5F59; /* 强调色悬停 */
+  --t-accent-soft: #E6F2F0; /* 强调浅底 */
+  --t-bar-done: var(--t-fill); /* 已走完的段（= fill 色） */
+  --t-bar-cur: #7FBDB6;     /* 当前段已填部分 */
+  --t-bar-track: var(--t-track); /* 未走到的段底槽（= track 色） */
+  --t-ink-soft: #2B3B55;    /* .lead 正文 */
+  --t-ink-mute: #33445F;    /* 弱一级正文 */
+  --t-ink-faint: #3A3A3C;   /* 说明块正文 */
+  --t-ink-faint2: #3B4A63;  /* 输入框 label */
+  --t-ink-faint3: #44546C;  /* 更弱一级 */
+  --t-ink-faint4: #4A5260;  /* 最弱（手填清单说明） */
+  --t-ink-faint5: #5B6472;  /* 门题说明 */
+  --t-on-dark: #FFFFFF;     /* 深底上的文字 */
+  --t-dark-bg: #12203A;     /* 深色块（切段横幅 / toast） */
+  --t-sign: #636A74;        /* 署名灰（12px 小字，按 WCAG AA 正文口径 ≥4.5:1：实测卡片底 4.93~5.79、页面底 4.60~5.50） */
+  --t-soft-gray: #F1F4F9;   /* 徽标底 / 目录悬停底 */
+  --t-soft-gray2: #F5F5F7;  /* 说明块底 */
+  --t-soft-gray3: #FBFCFE;  /* 选项悬停底 */
+  --t-soft-ok: #E7F6EE;     /* 成功徽标底 */
+  --t-soft-ok2: #E7F5EC;    /* 目录「已答」徽标底 */
+  --t-soft-warn: #FFF4E5;   /* warning 底 */
+  --t-soft-warn2: #FFF7ED;  /* warning 底（说明块用） */
+  --t-soft-danger: #FEE2E2; /* 红档徽标底 */
+  --t-ok: #0F8A4D;          /* 成功色 */
+  --t-warn: #B45309;        /* warning 文字色 */
+  --t-warn-border: #B45309; /* warning 边框 / 竖条 */
+  --t-danger: #B91C1C;      /* 红档「可能影响资格」 */
+  --t-danger-ink: #7C2D12;  /* 红档说明块正文 */
+  --t-tier3-line: #9CA3AF;  /* 档 3 左边线（灰） */
+  --t-dot-shenqing: #0F766E; /* 色点：深青 */
+  --t-dot-nuanzhu: #246A88; /* 色点：暖朱 */
+  --t-dot-wenshu: #1F3A5F;  /* 色点：文书 */
+  --t-radius: var(--t-card-r); /* 卡片圆角（= card-r） */
+  --t-radius-btn: var(--t-btn-r); /* 按钮圆角（= btn-r） */
+  --t-radius-sm: 10px;      /* 小圆角 */
+  --t-radius-input: var(--t-opt-r); /* 输入框圆角（= opt-r） */
+  --t-radius-panel: 16px;   /* 面板圆角 */
+  --t-gap: 24px;            /* 段间距 */
+  --t-card-pad: 20px;       /* 卡片内边距 */
+  --t-btn-h: 56px;          /* 主按钮高度 */
+  --t-title-font: -apple-system, "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif; /* 标题字体族 */
+  --t-seg-h: 6px;           /* 进度条小节高 */
+  --t-seg-r: 3px;           /* 进度条小节圆角 */
+  --t-fill: #0F766E;        /* 进度填充色（C = 墨色） */
+  --t-track: #E5E7EB;       /* 进度条底槽色 */
+  --t-band-h: 4px;          /* 顶栏横条高 */
+  --t-band: #E6F2F0;        /* 顶栏横条色（B = 深绿浅底） */
+  --t-card-r: 16px;         /* 题卡圆角 */
+  --t-card-mt: 64px;        /* 题卡距顶栏 */
+  --t-card-pad-t: 34px;     /* 题卡上内边距 */
+  --t-card-pad-b: 26px;     /* 题卡下内边距 */
+  --t-tag-bg: #E6F2F0;      /* 段标签底（B = 深绿浅底） */
+  --t-tag-fg: #0F766E;      /* 段标签字色 */
+  --t-tag-bd: none;         /* 段标签描边 */
+  --t-tag-r: 999px;         /* 段标签圆角 */
+  --t-qid-fg: #6B7280;      /* 题号色（C = 湖蓝） */
+  --t-opt-bg: #FFFFFF;      /* 选项底 */
+  --t-opt-bd: 1px solid #E5E7EB; /* 选项描边 */
+  --t-opt-r: 14px;          /* 选项圆角 */
+  --t-hint-bg: #F3F5F8;     /* 说明块底 */
+  --t-hint-bar: #0F766E;    /* 说明块左边线 */
+  --t-hint-r: 10px;         /* 说明块圆角 */
+  --t-btn-r: 14px;          /* 按钮圆角 */
+  --t-prev-bg: #FFFFFF;     /* 上一题按钮底 */
+  --t-next-bg: #0F766E;     /* 下一题按钮底（C = 墨色） */
+  --t-next-bg-hover: #0B5F59; /* 下一题按钮悬停底 */
+  --t-next-fg: #FFFFFF;     /* 下一题按钮字色 */
+  --t-numeral-display: block; /* 背景大数字显隐（C = 不渲染） */
+  --t-numeral-size: 96px;   /* 背景大数字字号 */
+  --t-numeral-lh: .8;       /* 背景大数字行高 */
+  --t-numeral-weight: 700;  /* 背景大数字字重 */
+  --t-numeral-ls: -2px;     /* 背景大数字字距 */
+  --t-numeral-color: rgba(15, 118, 110, .06); /* 背景大数字颜色 */
+  --t-numeral-left: auto;   /* 背景大数字左边距 */
+  --t-numeral-right: 20px;  /* 背景大数字右边距 */
+  --t-numeral-top: -28px;   /* 背景大数字上边距 */
+}
+
+/* ---------- ② 暖朱 （nuanzhu） ----------
+   纸感底色 + 收紧圆角 */
+html[data-theme="nuanzhu"] {
+  --t-bg: #FAF6EE;          /* 页面底 */
+  --t-card: #FFFCF6;        /* 卡片底 */
+  --t-ink: #1B1B1F;         /* 正文墨色 */
+  --t-muted: #6B6B70;       /* 次要灰（说明文字 / 英文原文行） */
+  --t-line: #E0D8C8;        /* 描边 */
+  --t-line-soft: #D9C3B4;   /* 描边（悬停 / 强调边框） */
+  --t-line-neutral: #C9C2B4; /* 中性描边（说明块左边线） */
+  --t-mark-line: #77899B;   /* 选项勾选框边框（对卡片底 ≥3:1，三套实测 3.19~3.51） */
+  --t-overlay: rgba(42, 30, 27, .45); /* 目录面板遮罩 */
+  --t-accent: #246A88;      /* 强调色（按钮底 / 链接 / 选中态边框） */
+  --t-accent-hover: #1D5670; /* 强调色悬停 */
+  --t-accent-soft: #E4EEF3; /* 强调浅底 */
+  --t-bar-done: var(--t-fill); /* 已走完的段（= fill 色） */
+  --t-bar-cur: #7FA6BA;     /* 当前段已填部分 */
+  --t-bar-track: var(--t-track); /* 未走到的段底槽（= track 色） */
+  --t-ink-soft: #33322F;    /* .lead 正文 */
+  --t-ink-mute: #4A4945;    /* 弱一级正文 */
+  --t-ink-faint: #43423E;   /* 说明块正文 */
+  --t-ink-faint2: #4E4D48;  /* 输入框 label */
+  --t-ink-faint3: #555450;  /* 更弱一级 */
+  --t-ink-faint4: #5A5955;  /* 最弱（手填清单说明） */
+  --t-ink-faint5: #5F5E59;  /* 门题说明 */
+  --t-on-dark: #FFFCF6;     /* 深底上的文字 */
+  --t-dark-bg: #2A1E1B;     /* 深色块（切段横幅 / toast） */
+  --t-sign: #6B6355;        /* 署名灰（12px 小字，按 WCAG AA 正文口径 ≥4.5:1：实测卡片底 4.93~5.79、页面底 4.60~5.50） */
+  --t-soft-gray: #F3EEE4;   /* 徽标底 / 目录悬停底 */
+  --t-soft-gray2: #F5F0E6;  /* 说明块底 */
+  --t-soft-gray3: #FCF8F0;  /* 选项悬停底 */
+  --t-soft-ok: #E9F2E7;     /* 成功徽标底 */
+  --t-soft-ok2: #EAF3E8;    /* 目录「已答」徽标底 */
+  --t-soft-warn: #FCEEDF;   /* warning 底 */
+  --t-soft-warn2: #FCF0E1;  /* warning 底（说明块用） */
+  --t-soft-danger: #F9E5E1; /* 红档徽标底 */
+  --t-ok: #0F8A4D;          /* 成功色 */
+  --t-warn: #B45309;        /* warning 文字色 */
+  --t-warn-border: #B45309; /* warning 边框 / 竖条 */
+  --t-danger: #B91C1C;      /* 红档「可能影响资格」 */
+  --t-danger-ink: #7C2D12;  /* 红档说明块正文 */
+  --t-tier3-line: #9CA3AF;  /* 档 3 左边线（灰） */
+  --t-dot-shenqing: #0F766E; /* 色点：深青 */
+  --t-dot-nuanzhu: #246A88; /* 色点：暖朱 */
+  --t-dot-wenshu: #1F3A5F;  /* 色点：文书 */
+  --t-radius: var(--t-card-r); /* 卡片圆角（= card-r） */
+  --t-radius-btn: var(--t-btn-r); /* 按钮圆角（= btn-r） */
+  --t-radius-sm: 6px;       /* 小圆角 */
+  --t-radius-input: var(--t-opt-r); /* 输入框圆角（= opt-r） */
+  --t-radius-panel: 6px;    /* 面板圆角 */
+  --t-gap: 24px;            /* 段间距 */
+  --t-card-pad: 18px;       /* 卡片内边距 */
+  --t-btn-h: 56px;          /* 主按钮高度 */
+  --t-title-font: "I485 Serif", "Songti SC", "Noto Serif CJK SC", SimSun, serif; /* 标题字体族 */
+  --t-seg-h: 5px;           /* 进度条小节高 */
+  --t-seg-r: 2px;           /* 进度条小节圆角 */
+  --t-fill: #1B1B1F;        /* 进度填充色（C = 墨色） */
+  --t-track: #E7DFCE;       /* 进度条底槽色 */
+  --t-band-h: 1px;          /* 顶栏横条高 */
+  --t-band: #E0D8C8;        /* 顶栏横条色（B = 深绿浅底） */
+  --t-card-r: 6px;          /* 题卡圆角 */
+  --t-card-mt: 20px;        /* 题卡距顶栏 */
+  --t-card-pad-t: 22px;     /* 题卡上内边距 */
+  --t-card-pad-b: 24px;     /* 题卡下内边距 */
+  --t-tag-bg: transparent;  /* 段标签底（B = 深绿浅底） */
+  --t-tag-fg: #1B1B1F;      /* 段标签字色 */
+  --t-tag-bd: 1px solid #E0D8C8; /* 段标签描边 */
+  --t-tag-r: 4px;           /* 段标签圆角 */
+  --t-qid-fg: #246A88;      /* 题号色（C = 湖蓝） */
+  --t-opt-bg: transparent;  /* 选项底 */
+  --t-opt-bd: 1px solid #E0D8C8; /* 选项描边 */
+  --t-opt-r: 6px;           /* 选项圆角 */
+  --t-hint-bg: #F4F0E6;     /* 说明块底 */
+  --t-hint-bar: #E0D8C8;    /* 说明块左边线 */
+  --t-hint-r: 4px;          /* 说明块圆角 */
+  --t-btn-r: 6px;           /* 按钮圆角 */
+  --t-prev-bg: transparent; /* 上一题按钮底 */
+  --t-next-bg: #1B1B1F;     /* 下一题按钮底（C = 墨色） */
+  --t-next-bg-hover: #2A2A2E; /* 下一题按钮悬停底 */
+  --t-next-fg: #FFFCF6;     /* 下一题按钮字色 */
+  --t-numeral-display: none; /* 背景大数字显隐（C = 不渲染） */
+  --t-numeral-size: 48px;   /* 背景大数字字号 */
+  --t-numeral-lh: 1.05;     /* 背景大数字行高 */
+  --t-numeral-weight: 400;  /* 背景大数字字重 */
+  --t-numeral-ls: 2px;      /* 背景大数字字距 */
+  --t-numeral-color: rgba(27, 27, 31, .10); /* 背景大数字颜色 */
+  --t-numeral-left: 20px;   /* 背景大数字左边距 */
+  --t-numeral-right: auto;  /* 背景大数字右边距 */
+  --t-numeral-top: 6px;     /* 背景大数字上边距 */
+}
+
+/* ---------- ② 文书 （wenshu） ----------
+   近方角 + 藏青 */
+html[data-theme="wenshu"] {
+  --t-bg: #F2EFE8;          /* 页面底 */
+  --t-card: #FFFDF9;        /* 卡片底 */
+  --t-ink: #17181A;         /* 正文墨色 */
+  --t-muted: #5F5C55;       /* 次要灰（说明文字 / 英文原文行） */
+  --t-line: #D8D2C6;        /* 描边 */
+  --t-line-soft: #BFC7D2;   /* 描边（悬停 / 强调边框） */
+  --t-line-neutral: #C2BEB4; /* 中性描边（说明块左边线） */
+  --t-mark-line: #8290A4;   /* 选项勾选框边框（对卡片底 ≥3:1，三套实测 3.19~3.51） */
+  --t-overlay: rgba(27, 42, 61, .45); /* 目录面板遮罩 */
+  --t-accent: #1F3A5F;      /* 强调色（按钮底 / 链接 / 选中态边框） */
+  --t-accent-hover: #16293F; /* 强调色悬停 */
+  --t-accent-soft: #E8EDF4; /* 强调浅底 */
+  --t-bar-done: var(--t-fill); /* 已走完的段（= fill 色） */
+  --t-bar-cur: #7E93AF;     /* 当前段已填部分 */
+  --t-bar-track: var(--t-track); /* 未走到的段底槽（= track 色） */
+  --t-ink-soft: #2C2E33;    /* .lead 正文 */
+  --t-ink-mute: #3C3F45;    /* 弱一级正文 */
+  --t-ink-faint: #3A3C41;   /* 说明块正文 */
+  --t-ink-faint2: #44474D;  /* 输入框 label */
+  --t-ink-faint3: #4C4F55;  /* 更弱一级 */
+  --t-ink-faint4: #52555B;  /* 最弱（手填清单说明） */
+  --t-ink-faint5: #57595F;  /* 门题说明 */
+  --t-on-dark: #FFFDF9;     /* 深底上的文字 */
+  --t-dark-bg: #1B2A3D;     /* 深色块（切段横幅 / toast） */
+  --t-sign: #6A655B;        /* 署名灰（12px 小字，按 WCAG AA 正文口径 ≥4.5:1：实测卡片底 4.93~5.79、页面底 4.60~5.50） */
+  --t-soft-gray: #EBE7DD;   /* 徽标底 / 目录悬停底 */
+  --t-soft-gray2: #EFECE4;  /* 说明块底 */
+  --t-soft-gray3: #FAF8F2;  /* 选项悬停底 */
+  --t-soft-ok: #E5EDE4;     /* 成功徽标底 */
+  --t-soft-ok2: #E6EEE5;    /* 目录「已答」徽标底 */
+  --t-soft-warn: #F6EEDA;   /* warning 底 */
+  --t-soft-warn2: #F7F0E0;  /* warning 底（说明块用） */
+  --t-soft-danger: #F5E3E0; /* 红档徽标底 */
+  --t-ok: #0F8A4D;          /* 成功色 */
+  --t-warn: #B45309;        /* warning 文字色 */
+  --t-warn-border: #B45309; /* warning 边框 / 竖条 */
+  --t-danger: #B91C1C;      /* 红档「可能影响资格」 */
+  --t-danger-ink: #7C2D12;  /* 红档说明块正文 */
+  --t-tier3-line: #9CA3AF;  /* 档 3 左边线（灰） */
+  --t-dot-shenqing: #0F766E; /* 色点：深青 */
+  --t-dot-nuanzhu: #246A88; /* 色点：暖朱 */
+  --t-dot-wenshu: #1F3A5F;  /* 色点：文书 */
+  --t-radius: var(--t-card-r); /* 卡片圆角（= card-r） */
+  --t-radius-btn: var(--t-btn-r); /* 按钮圆角（= btn-r） */
+  --t-radius-sm: 2px;       /* 小圆角 */
+  --t-radius-input: var(--t-opt-r); /* 输入框圆角（= opt-r） */
+  --t-radius-panel: 2px;    /* 面板圆角 */
+  --t-gap: 24px;            /* 段间距 */
+  --t-card-pad: 20px;       /* 卡片内边距 */
+  --t-btn-h: 56px;          /* 主按钮高度 */
+  --t-title-font: "I485 Serif", "Songti SC", "Noto Serif CJK SC", SimSun, serif; /* 标题字体族 */
+  --t-seg-h: 5px;           /* 进度条小节高 */
+  --t-seg-r: 1px;           /* 进度条小节圆角 */
+  --t-fill: #1F3A5F;        /* 进度填充色（C = 墨色） */
+  --t-track: #E2DCCF;       /* 进度条底槽色 */
+  --t-band-h: 1px;          /* 顶栏横条高 */
+  --t-band: #D8D2C6;        /* 顶栏横条色（B = 深绿浅底） */
+  --t-card-r: 2px;          /* 题卡圆角 */
+  --t-card-mt: 18px;        /* 题卡距顶栏 */
+  --t-card-pad-t: 60px;     /* 题卡上内边距 */
+  --t-card-pad-b: 26px;     /* 题卡下内边距 */
+  --t-tag-bg: transparent;  /* 段标签底（B = 深绿浅底） */
+  --t-tag-fg: #1F3A5F;      /* 段标签字色 */
+  --t-tag-bd: 1px solid #1F3A5F; /* 段标签描边 */
+  --t-tag-r: 2px;           /* 段标签圆角 */
+  --t-qid-fg: #6E6A61;      /* 题号色（C = 湖蓝） */
+  --t-opt-bg: transparent;  /* 选项底 */
+  --t-opt-bd: 1px solid #D8D2C6; /* 选项描边 */
+  --t-opt-r: 2px;           /* 选项圆角 */
+  --t-hint-bg: #F1EEE7;     /* 说明块底 */
+  --t-hint-bar: #1F3A5F;    /* 说明块左边线 */
+  --t-hint-r: 2px;          /* 说明块圆角 */
+  --t-btn-r: 2px;           /* 按钮圆角 */
+  --t-prev-bg: transparent; /* 上一题按钮底 */
+  --t-next-bg: #1F3A5F;     /* 下一题按钮底（C = 墨色） */
+  --t-next-bg-hover: #16293F; /* 下一题按钮悬停底 */
+  --t-next-fg: #FFFDF9;     /* 下一题按钮字色 */
+  --t-numeral-display: block; /* 背景大数字显隐（C = 不渲染） */
+  --t-numeral-size: 48px;   /* 背景大数字字号 */
+  --t-numeral-lh: 1.05;     /* 背景大数字行高 */
+  --t-numeral-weight: 400;  /* 背景大数字字重 */
+  --t-numeral-ls: 2px;      /* 背景大数字字距 */
+  --t-numeral-color: rgba(23, 24, 26, .10); /* 背景大数字颜色 */
+  --t-numeral-left: 20px;   /* 背景大数字左边距 */
+  --t-numeral-right: auto;  /* 背景大数字右边距 */
+  --t-numeral-top: 6px;     /* 背景大数字上边距 */
+}

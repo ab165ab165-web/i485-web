@@ -1,0 +1,43 @@
+{
+  "source": "/usr/share/fonts/noto-cjk/NotoSerifCJK-SemiBold.ttc",
+  "face": {
+    "index": 2,
+    "family": "Noto Serif CJK SC SemiBold",
+    "full": "Noto Serif CJK SC SemiBold",
+    "copyright": "© 2017-2024 Adobe (http://www.adobe.com/).",
+    "glyphs": 65535
+  },
+  "source_ttc_bytes": 26575144,
+  "woff2": "/home/deck/.openclaw/workspace/work/i485-web/app/fonts/NotoSerifSC-SemiBold.subset.woff2",
+  "woff2_bytes": 170864,
+  "limit_bytes": 307200,
+  "size_ok": true,
+  "required_unique_chars": 982,
+  "required_cjk_chars": 874,
+  "glyphs_in_subset_cmap": 981,
+  "missing_count": 0,
+  "missing": [],
+  "known_fallback_count": 1,
+  "known_fallback": [
+    {
+      "char": "▾",
+      "codepoint": "U+25BE",
+      "reason": "U+25BE ▾：Noto Serif CJK SC 源字体无此字形；仅在 13px 摘要行，该行用系统黑体，不经本字体"
+    }
+  ],
+  "coverage_ok": true,
+  "tier": "all-app-text",
+  "dropped_count": 0,
+  "dropped_sample": [],
+  "source_files": [
+    "index.html",
+    "app.js",
+    "sections.js",
+    "js/core.js",
+    "js/instructions.js",
+    "data/questions.js",
+    "data/handwrite.js"
+  ],
+  "missing_source_files": [],
+  "ofl_present": true
+}

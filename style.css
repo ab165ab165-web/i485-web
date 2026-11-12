@@ -1,0 +1,1272 @@
+/* ============================================================
+   I-485 中文填表助手 —— 视觉层
+   大字排版 + 零阴影零渐变；颜色全部读 theme.css 的令牌。
+
+   ⚠ 颜色唯一事实源 = theme.css。
+     本文件（:root 之外）不允许出现任何裸 hex —— 验收 A12 断言计数为 0。
+     改颜色只改 theme.css 一处，三套皮肤同时生效。
+   ============================================================ */
+
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+/* ---------- 标题字体：思源宋体子集（v9 字体批）----------
+   只有 h1 / .segmap-title / #segTitle / #doneTitle 用；正文、选项、
+   英文行、13–15px 小字一律沿用上面的系统黑体栈。
+   子集由 build/build-font-subset.py 生成（按全站文案抠字，加题后重跑）。
+   字重只打包 600 一个；标题的 700 一并写成 600，避免浏览器合成假粗体。
+   file:// 下若字体被 Chrome 拦（见 js/font-check.js），<html> 会加 .no-serif，
+   显式跳过本文件，回落到系统宋体栈。 */
+@font-face {
+  font-family: "I485 Serif";
+  src: url("fonts/NotoSerifSC-SemiBold.subset.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 600;
+  /* optional：字体 100ms 内没到就用系统字体，本次页面不再替换（不跳动）。
+     字体下载仍继续，下次打开直接用缓存。预加载见 index.html <link rel=preload>。 */
+  font-display: optional;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  color: var(--ink);
+  font-family: -apple-system, "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+  font-size: 18px;        /* 正文 18px */
+  line-height: 1.75;      /* 正文行高 1.75 */
+  background-color: var(--bg);
+  /* 底色切换必须硬切：明确禁用过渡 */
+  transition: none;
+}
+
+/* 底栏是 fixed，页脚如果留在文档流里，内容高度刚好超过一屏时必然落进底栏那 77px，
+   所以答题页把页脚也固定在底栏正上方；正文底部留出「页脚 + 底栏」的总高度。
+   开始页 / 完成页没有底栏，也各自在卡片里写了同一句免责声明，页脚直接隐藏。 */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* 中文行长：不写死像素，用 em 跟随各自字号 —— 22em ≈ 22 个汉字 */
+p, li, h1, h2, label, .zh, .lead { max-width: 22em; }
+h2, .en, .hint, .tiny, .meta { max-width: 22em; }
+
+/* ---------- 顶栏 ---------- */
+#topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+  background: var(--card);
+  border-bottom: 0.5px solid var(--line);
+}
+
+/* 顶栏下方的横条（v9 批 4）—— 对应 12:10 定稿 mockup 的 .band。
+   B = 4px 深绿浅底（原蓝浅底，已换成同类深绿值）；C = 1px 纸色线；A = 1px 纸色线。
+   用绝对定位贴在顶栏底边：不占文档流，顶栏高度不变，
+   题卡距顶栏的距离不受它影响。 */
+#topbar .band {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: var(--t-band-h, 1px);
+  background: var(--t-band, var(--line));
+}
+
+/* 分段进度条：8 个独立小节，宽度按题量。
+   小节位置 = 段号：段身份靠位置 + 顶栏段名文字，不靠颜色。 */
+.segs {
+  display: flex; gap: 4px;
+  padding: 10px 18px 8px;
+}
+.seg-chunk {
+  /* v9 批 4：段条高度 / 圆角 / 底槽色按 12:10 定稿 mockup 逐套取值
+     （B 6px/3px · C 5px/2px · A 5px/1px）。 */
+  flex: 1 1 0; height: var(--t-seg-h, 6px); border-radius: var(--t-seg-r, 3px);
+  background: var(--t-track, var(--bar-track));
+  /* 原来写 overflow: hidden 是为了让填充块 <i> 的圆角被裁在槽里。
+     2026-11-09 去掉了：<i> 自己是 3px 圆角、height:100%，视觉与原来逐像素一致，
+     但去掉后 ::after 的加大点击区（下面）才不会被裁掉。 */
+  position: relative;
+}
+/* 2026-11-09：进度条第 N 小节可点 = 跳到第 N 段的第一道当前可见题。
+   可点反馈（cursor + 按下态）但不改配色体系：小节本身的颜色由进度状态决定，
+   按下态只用 brightness 滤镜（不填色），不引入新颜色。 */
+.seg-chunk[data-seg] { cursor: pointer; }
+.seg-chunk[data-seg]:hover > i { filter: brightness(0.92); }
+.seg-chunk[data-seg]:active > i { filter: brightness(0.82); }
+.seg-chunk[data-seg]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* 6px 的小节在手机上点不准（手指按不中）。把点击区向上下各扩 6px → 18px 高，
+   扩出来的范围完全落在 .segs 自己的 padding 里（上下各 8/10px），
+   不会抢「目录 / 导出」两颗按钮的点击。 */
+.seg-chunk[data-seg]::after {
+  content: ''; position: absolute; left: 0; right: 0;
+  top: -6px; bottom: -6px;
+}
+.seg-chunk > i {
+  display: block; height: 100%; width: 0;
+  /* 进度填充色 = 皮肤自己的 fill（B 深绿 · C 墨色 · A 藏青） */
+  background: var(--t-fill, var(--bar-done)); border-radius: var(--t-seg-r, 3px);
+}
+.seg-chunk.done > i { width: 100%; }
+
+/* intro 状态下不显示进度条与「—」计数：还没开始，进度没有意义 */
+body.intro .segs, body.intro .counter { display: none; }
+
+.topline {
+  display: flex; align-items: center; justify-content: flex-start;
+  gap: 12px; padding: 0 18px;
+}
+.brand {
+  /* v9 批 5：品牌行对齐 mockup 的 .brand（17px / 700 / 字距 .3px / 行高 1.5）。 */
+  font-weight: 700; font-size: 17px; line-height: 1.5; letter-spacing: .3px;
+  /* 2026-11-09 修（法正复审 E）：品牌名可收缩。
+     原来写死 flex:0 0 auto —— 320 宽 + 2× 字号时挤不下，
+     只能把顶栏右侧的「导出」按钮顶出屏幕（右侧溢出 24px）。
+     改成可收缩 + 省略号后，挤不下时先截断品牌名，按钮永远留在屏内。 */
+  flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.counter {
+  font-size: 15px; color: var(--muted); font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  /* 顶栏右侧有「随时导出」按钮时，计数自己让位（截断加省略号），
+     按钮绝不被挤出屏幕 —— 430 宽下 brand + counter + 按钮必须一行放得下。 */
+  margin-left: auto; flex: 0 1 auto; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis;
+}
+
+/* 顶栏「随时导出」按钮（2026-11-09）
+   —— ghost 小号，常驻顶栏右侧，不挤压进度条（.segs）与段名（.partline）。
+   —— 只在答题页出现：开始页 / 切段过渡卡 / 完成页两屏都不显示。
+   —— 高度 44px（不是 --btn-h 的 56px）：这是顶栏里的次级动作，
+      拿表屏那颗「下载填好的表」才沿用 --btn-h（56px），保证点得中。
+   —— 选择器写在文件末尾的「按钮」一节之后（.btn 的 font-size 会覆盖这里的），
+      所以这里只放几何，字体/颜色在末尾统一写。 */
+.partline {
+  /* v9 批 5：段名行对齐 mockup 的 .secname（15px / 600 / 行高 1.5）。 */
+  padding: 1px 18px 0; font-size: 15px; line-height: 1.5; font-weight: 600; color: var(--ink-mute);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* 段标题前的 8px 圆点 = 当前段强调色 */
+.partline #partTitle::before {
+  content: ''; display: inline-block; width: 8px; height: 8px;
+  border-radius: 50%; background: var(--seg-accent);
+  margin-right: 6px; vertical-align: 1px;
+}
+/* 开始页 / 完成页没有段名，空标题不画孤立圆点 */
+.partline #partTitle:empty::before { display: none; }
+/* 顶栏只留一行「本段已答 a / b」。
+   原来每题一个圆点（最长 28 个点换行，顶栏多占 53px），2026-11-09 已删：
+   段身份改由切段横幅 + 段名文字 + 进度条第 N 小节承担。 */
+.dotsline {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  padding: 5px 18px 8px;
+}
+.dotsline .dots-label {
+  flex: 1 0 100%;
+  font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums;
+  margin-right: 2px; white-space: nowrap;
+}
+
+/* 切段横幅（v9 批 1：改为淡入淡出，2026-11-10）
+   原口径「硬切不渐变」已作废：hidden 属性 + display:none 无法过渡，
+   显隐改由 class（.is-on / .is-out）控制。
+   时序：淡入 200ms → 停 1.6s → 淡出 180ms → 真正隐藏。
+   prefers-reduced-motion: reduce 下动画时长为 0（验收 A11）。 */
+.seg-banner {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 30;
+  height: 118px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 2px;
+  padding: 6px 18px;
+  background: var(--dark-bg); color: var(--on-dark);
+  text-align: center;
+  /* 隐藏态：不可见但仍占着 fixed 层（不参与布局，不影响文档流） */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 180ms ease-out, visibility 0s linear 180ms;
+}
+/* 淡入中：可见 + 渐显（200ms） */
+.seg-banner.is-on {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 200ms ease-out, visibility 0s linear 0s;
+}
+/* 淡出中：仍可见，渐隐（180ms），结束后 JS 真正 hidden */
+.seg-banner.is-out {
+  opacity: 0;
+  visibility: visible;
+  pointer-events: none;
+  transition: opacity 180ms ease-out, visibility 0s linear 180ms;
+}
+/* 旧 hidden 属性路径仍留一条兜底（JS 改 class 前的那一瞬可能带 hidden） */
+.seg-banner[hidden] { display: none; }
+.seg-banner .sb-main { font-size: 22px; font-weight: 700; line-height: 1.4; }
+.seg-banner .sb-sub { font-size: 14px; font-weight: 500; line-height: 1.4; opacity: .8; }
+
+/* 晕动防护：用户偏好「减少动态效果」时，横幅直接出现 / 消失，不做过渡 */
+@media (prefers-reduced-motion: reduce) {
+  .seg-banner,
+  .seg-banner.is-on,
+  .seg-banner.is-out {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ---------- 舞台 ---------- */
+#stage {
+  max-width: 720px;
+  margin: 0 auto;
+  flex: 1 0 auto;
+  /* 底部预留 = 页脚 + 底栏；iPhone 安全区会把底栏顶高，预留必须一起加上。
+     v9 批 1 修 Y8：页脚变高后（新增「已自动保存」行 + 色点行），
+     430×932 下答题页滚到底时最后一道题卡被页脚遮了 24.3px。
+     底部预留从 120px 提到 146px（页脚实测最高 146px）。
+     验收 A3 同步加断言：滚到最底时 card.bottom ≤ foot.top。 */
+  padding: 132px 16px calc(146px + env(safe-area-inset-bottom));
+}
+.view { display: none; }
+.view.active { display: block; }
+
+/* 切段过渡卡：进入新段时出现一次，不计入题库；底栏与页脚让位 */
+body.seg #navbar, body.seg #foot { display: none; }
+body.seg .dotsline { display: none; }
+.segcard { border-left: 4px solid var(--seg-accent); padding: 24px; }
+.segcard-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.segcard-dot {
+  display: inline-block; width: 12px; height: 12px; border-radius: 50%;
+  background: var(--seg-accent);
+}
+.segcard-no { font-size: 14px; line-height: 1.6; color: var(--muted); }
+.segcard h1 { margin: 0 0 8px; }
+.segcard .lead { margin: 0 0 24px; }
+
+.card {
+  background: var(--card);
+  border: 0.5px solid var(--line);   /* 白底 + 0.5px 描边，无阴影 */
+  /* v9 批 6 · P1-1：通用卡只保留「圆角 + 基础内边距」。
+     · 圆角跟皮肤走（--t-card-r）—— mockup 的卡片通用值。
+     · 基础内边距 = 20px，**三套一致**（不是 var(--t-card-pad)）。
+       理由：--t-card-pad 是 mockup 的**题卡**内边距（批 4 按 mockup 逐套取值，
+       C 套 20→18px）；批 4 之前它三套都是 20px（HEAD 版 theme.css 可查），
+       通用卡用的就是它。mockup 里没有开始页 / 完成页 / 拿表屏 —— 这些通用卡的
+       内边距是应用自有的，批 6 复审 brief 要求「回到批 4 之前的实测值」
+       （三套 padding-top 都是 20px），不能跟着题卡令牌走。
+       ⚠ 与另一版 brief（BRIEF-v9-batch6-fix.md「padding 属于 mockup 通用值，
+       开始页跟着变是合理的」）在此点上口径不同：那样 C 套通用卡 padding-top
+       = 18px，与批前实测（20px）差 2px。本文件按复审 brief（更新的一条）执行。
+     · 题卡专属值（--t-card-pad-t / --t-card-pad-b / --t-card-mt）
+       只作用在 .card.question，不再外溢到通用卡。
+     批前实测（git show HEAD:i485-web/app/style.css 的 .card 既无 margin-top
+     也无 padding-top 覆盖）：开始页卡与拿表屏卡都是 margin-top=0 /
+     padding-top=20px（三套一致）。断言写在 build/v9-style3-accept.js 的 S2 / S6 段。 */
+  border-radius: var(--t-card-r, 16px);
+  padding: 20px;
+}
+.card + .card { margin-top: var(--gap); }
+
+/* 字号补偿（实测依据见 reports/REPORT-font-v9.md）：
+   Noto Serif CJK 与 Noto Sans CJK 的 em 框相同，22px 时 ink 高都是 20px；
+   但宋体 600 的笔画细，墨量只有黑体 700 的 73%（24px 档 85% 最接近）。
+   按「墨量最接近」选 24px 档：22→24 = +2px，故 h1 26→28、段名 20→22。 */
+h1 { font-size: 28px; margin: 0 0 12px; line-height: 1.4; }
+h1,
+#segTitle,
+#doneTitle,
+.segmap-title {
+  font-family: "I485 Serif", "Songti SC", "Noto Serif CJK SC", SimSun, serif;
+  font-weight: 600;
+}
+/* 题目标题（mockup 的 .title）字体族按皮肤走（v9 批 4）：
+   B 走系统黑体；A / C 走思源宋体子集。 */
+#qTitle {
+  /* v9 批 5：字距对齐 mockup 的 .title（.2px）。 */
+  font-family: var(--t-title-font, -apple-system, "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif);
+  letter-spacing: .2px;
+}
+/* file:// 回落：显式不请求 woff2，直接用系统宋体栈 */
+html.no-serif h1,
+html.no-serif #segTitle,
+html.no-serif #doneTitle,
+html.no-serif .segmap-title {
+  font-family: "Songti SC", "Noto Serif CJK SC", SimSun, serif;
+}
+/* 同上，但只对用宋体的两套皮肤（B 走黑体，不该被拉回宋体） */
+html.no-serif:not([data-theme="shenqing"]) #qTitle {
+  font-family: "Songti SC", "Noto Serif CJK SC", SimSun, serif;
+}
+h2 {
+  font-size: 22px;        /* 问题标题 22px */
+  line-height: 1.5;       /* 行高 1.5 */
+  font-weight: 600;       /* 字重 600 */
+  margin: 10px 0 8px;
+  /* 标题不落孤字：优先均衡换行，老浏览器退回不拆词 */
+  text-wrap: balance;
+  /* 2026-11-09 修窄屏横向溢出（L13-31）：
+     原来写 word-break: keep-all —— 对中文等于「禁止在汉字间断行」，
+     一道长题面（Part 9 那些中英混排的超长标题）会撑成一块不可断的单词块，
+     把 #stage 顶宽，320/360/375/390 宽下 documentElement.scrollWidth 恒为 403。
+     实测（改前）：320 宽下 107 道可见题里 64 道横向溢出，最差溢出 237px。
+     改成 word-break: normal（按语言正常断行：中文可任意断，英文按词断）
+     + overflow-wrap: break-word（超长无空格串兜底可断）。
+     改后同口径复测：107 道题 0 道溢出。
+     全库已无生效的 keep-all（L13-31：改一处即全盘扫同类，h2 与 .tier-head h3 两处一起改）。 */
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+.lead { color: var(--ink-soft); margin: 0 0 var(--gap); }
+/* 完成页开头说明：行宽收 1 字 + pretty，减少末行只剩一两个字 */
+#doneSummary { max-width: 21em; text-wrap: pretty; }
+.tiny { font-size: 16px; color: var(--muted); margin: 14px 0 0; line-height: 1.75; }
+.meta { font-size: 16px; color: var(--muted); margin: 12px 0 14px; line-height: 1.75; }
+hr { border: 0; border-top: 0.5px solid var(--line); margin: var(--gap) 0; }
+
+.rules { padding-left: 22px; margin: 0 0 8px; }
+.rules li { margin-bottom: 12px; color: var(--ink-mute); max-width: 21em; text-wrap: pretty; }
+
+/* ---------- 开场页：八段地图 ---------- */
+.segmap-title { font-size: 22px; line-height: 1.4; margin: 24px 0 8px; }
+.segmap { display: flex; flex-direction: column; gap: 8px; margin: 0 0 16px; }
+.segmap-row { display: flex; gap: 16px; align-items: flex-start; padding: 8px 0; }
+.segmap-dot {
+  flex: 0 0 8px; width: 8px; height: 8px; border-radius: 50%;
+  margin-top: 8px; background: var(--accent);
+}
+.segmap-main { flex: 1; min-width: 0; }
+.segmap-head { display: flex; align-items: baseline; gap: 8px; }
+.segmap-name { font-size: 16px; font-weight: 600; line-height: 1.6; }
+.segmap-n { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.segmap-blurb {
+  font-size: 16px; line-height: 1.6; color: var(--muted);
+  margin-top: 0; max-width: 22em; text-wrap: pretty;
+}
+
+/* ---------- 题目 ---------- */
+/* 题卡左侧 4px 竖条 = 当前段强调色，一眼看出「在第几段」。
+   v9 批 4：竖条占掉 4px，所以左内边距 = mockup 的 --card-pad 减 4px，
+   「竖条 + 内边距」合计仍等于 mockup 的 --card-pad（内容缩进与定稿一致）。 */
+.card.question {
+  border-left: 4px solid var(--seg-accent);
+  /* v9 批 4：题卡圆角 / 内边距 / 距顶栏距离按 12:10 定稿 mockup 逐套取值。
+     B：16px 圆角、20/34/26 内边距、距顶栏 64px；
+     C：6px、18/22/24、20px；A：2px、20/60/26、18px。
+     v9 批 6 · P1-1：这几个令牌只属于题卡，写在这里而不是通用 .card。 */
+  padding: var(--t-card-pad, 20px);
+  padding-top: var(--t-card-pad-t, 34px);
+  padding-bottom: var(--t-card-pad-b, 26px);
+  padding-left: calc(var(--t-card-pad, 20px) - 4px);
+  margin-top: var(--t-card-mt, 0px);
+  /* v9 批 5：背景大数字是 .card 的绝对定位子节点，
+     题卡必须是它的定位上下文（mockup 的 .numeral 相对 .card 定位）。 */
+  position: relative;
+}
+.card.question h2 { margin: 0 0 8px; }
+
+/* ---------- 背景大数字（v9 批 5） ----------
+   真相源 = 12:10 定稿 mockup 的 .numeral 规则：
+     A-文书质感 → wenshu：left:20px; top:6px; 48px/1.05; 400; ls 2px
+     B-冷静工具 → shenqing：right:20px; top:-28px; 96px/.8; 700; ls -2px
+     C-暖纸朱红 → nuanzhu：display:none
+   尺寸 / 位置 / 颜色三套走 theme.css 令牌（本文件不写死颜色，只写 fallback）。
+   字体族照 mockup 走 var(--serif)：三套都是宋体栈（B 的标题是黑体，
+   但 mockup 的 .numeral 固定 var(--serif)）。 */
+.numeral {
+  position: absolute;
+  font-family: "I485 Serif", "Songti SC", "Noto Serif CJK SC", SimSun, serif;
+  font-size: var(--t-numeral-size, 48px);
+  line-height: var(--t-numeral-lh, 1.05);
+  font-weight: var(--t-numeral-weight, 400);
+  letter-spacing: var(--t-numeral-ls, 2px);
+  color: var(--t-numeral-color, currentColor);
+  left: var(--t-numeral-left, 20px);
+  right: var(--t-numeral-right, auto);
+  top: var(--t-numeral-top, 6px);
+  display: var(--t-numeral-display, block);
+  /* 装饰件：不参与无障碍树、不吃点击、压在内容之下 */
+  pointer-events: none;
+  z-index: 0;
+}
+/* file:// 回落：显式不请求 woff2，用系统宋体栈 */
+html.no-serif .numeral {
+  font-family: "Songti SC", "Noto Serif CJK SC", SimSun, serif;
+}
+/* 内容压在大数字之上（mockup 的 .cardbody{position:relative;z-index:1}）。
+   .qbody 必须保持 static —— 大数字是它的子节点，static 才能让
+   position:absolute 相对「题卡」定位（mockup 里它相对 .card 定位）。 */
+.card.question > .qhead,
+.card.question > #qTitle,
+.card.question > .enbox,
+.card.question > #qHint { position: relative; z-index: 1; }
+.qbody > *:not(.numeral) { position: relative; z-index: 1; }
+.qhead { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.chip {
+  /* v9 批 4：段标签（mockup 的 .tag）底 / 描边 / 圆角 / 字色逐套取值。
+     B：深绿浅底 + 无描边 + 胶囊圆角；C：透明底 + 纸色描边 + 4px；
+     A：透明底 + 藏青描边 + 2px。 */
+  /* v9 批 5：段标签排版对齐 mockup 的 .tag（12px / 700 / 字距 .6px / 行高 1.5）。 */
+  font-size: 12px; padding: 2px 9px; border-radius: var(--t-tag-r, 999px);
+  background: var(--t-tag-bg, var(--accent-soft)); color: var(--t-tag-fg, var(--accent));
+  border: var(--t-tag-bd, none);
+  font-weight: 700;
+  letter-spacing: .6px;
+  line-height: 1.5;
+}
+/* v9 批 5：题号排版对齐 mockup 的 .qid（12px / 字距 .2px / 行高 1.5）。 */
+.qid {
+  font-size: 12px; line-height: 1.5; letter-spacing: .2px;
+  color: var(--t-qid-fg, var(--muted)); font-variant-numeric: tabular-nums;
+}
+
+/* 英文原文默认收起：<details> 不自造组件，summary 就是「看表上原文怎么问」 */
+.enbox { margin: 0 0 16px; }
+.enbox[hidden] { display: none; }
+.enbox summary {
+  font-size: 15px; line-height: 1.6; color: var(--muted);
+  cursor: pointer; min-height: 40px; padding: 8px 0;
+  list-style: none;
+}
+.enbox summary::-webkit-details-marker { display: none; }
+.enbox summary::marker { content: ''; }
+.enbox summary::after { content: ' ▾'; font-size: 12px; }
+.enbox[open] summary::after { content: ' ▴'; }
+/* 英文原文行 15px / 1.6 / var(--muted) */
+.en {
+  /* v9 批 5：英文原文行对齐 mockup 的 .en（13px / 行高 1.4）。 */
+  font-size: 13px; line-height: 1.4; color: var(--muted);
+  margin: 8px 0 0;
+}
+
+/* 说明文字 16px / 1.75 —— 两档：
+   info（默认）= 这题在问什么、怎么填；warn = 答错/漏答会有后果。 */
+.hint {
+  /* v9 批 4：说明块（mockup 的 .hint）底 / 左边线 / 圆角逐套取值。
+     v9 批 5：字号对齐 mockup 的 .hint p（18px / 1.75）。 */
+  font-size: 18px; line-height: 1.75; color: var(--ink-faint);
+  background: var(--t-hint-bg, var(--soft-gray2));
+  border-left: 3px solid var(--t-hint-bar, var(--line-neutral));
+  padding: 8px 16px; border-radius: var(--t-hint-r, 8px);
+  margin: 0 0 16px;
+}
+.hint.warn {
+  color: var(--warn); background: var(--soft-warn2); border-left-color: var(--warn-border);
+}
+.hint[hidden] { display: none; }
+/* 门题的长说明收进 details：屏幕上一屏只留 2 行，想看细节自己展开 */
+.hint details { margin-top: 8px; }
+.hint summary {
+  font-size: 15px; color: var(--muted); cursor: pointer;
+  min-height: 24px; line-height: 1.6;
+}
+.hint details .hintmore { margin: 6px 0 0; }
+.qbody { margin-top: 0; }
+
+/* 不确定出口：次级按钮，尺寸与主选项同高（56px），标了之后换成描边强调 */
+.btn.uncertain-btn {
+  display: block; width: 100%; height: var(--btn-h); min-height: var(--btn-h);
+  margin-top: 8px; padding: 0 20px; font-size: 16px; font-weight: 600;
+  color: var(--ink-faint3);
+}
+.btn.uncertain-btn.marked {
+  border-color: var(--warn-border); background: var(--soft-warn2); color: var(--warn);
+}
+.un-note { margin: 8px 0 0; }
+.gates-note { margin: 8px 0 0; color: var(--ink-faint5); }
+
+/* 选项：点击区 ≥ 44×44，实际最小 56px 高 */
+.opt {
+  display: flex; align-items: center; gap: 16px; width: 100%;
+  min-height: var(--btn-h); padding: 16px;
+  /* v9 批 4：选项行（mockup 的 .opt）底 / 描边 / 圆角逐套取值。
+     B：白底 + 浅灰描边 + 14px；C：透明底 + 纸色描边 + 6px；
+     A：透明底 + 纸色描边 + 2px。 */
+  text-align: left; background: var(--t-opt-bg, var(--card)); color: var(--ink);
+  border: var(--t-opt-bd, 1px solid var(--line)); border-radius: var(--t-opt-r, 14px);
+  /* v9 批 5：行高对齐 mockup 的 .olabel（18px / 1.4）。 */
+  margin-bottom: 8px; font-size: 18px; line-height: 1.4;
+  font-family: inherit; cursor: pointer; transition: .15s;
+}
+.opt:hover { border-color: var(--line-soft); background: var(--soft-gray3); }
+.opt.sel { border-color: var(--accent); background: var(--accent-soft); }
+.opt .mark {
+  flex: 0 0 24px; height: 24px; border-radius: 50%;
+  /* 勾选框边框用 --mark-line（对卡片底 ≥3:1）：原来的 --line-soft 只有 1.5:1，
+     空心圆圈几乎看不出这是个勾选框（WCAG 1.4.11 非文字对比度）。 */
+  border: 2px solid var(--mark-line); display: grid; place-items: center;
+  font-size: 14px; color: var(--on-dark);
+}
+.opt.multi .mark { border-radius: 6px; }
+.opt.sel .mark { background: var(--accent); border-color: var(--accent); }
+.opt .zh { font-weight: 600; }
+.opt .lbl { flex: 1; min-width: 0; }
+/* v9 批 5：选项里的英文行对齐 mockup 的 .en（13px / 行高 1.4）。 */
+.opt .lbl small { display: block; color: var(--muted); font-size: 13px; line-height: 1.4; font-weight: 400; margin-top: 2px; }
+
+/* 门题（Part 2 Item 3）：8 个选项要在一屏里看全，所以压高度不动字号 */
+.qbody.gate .opt {
+  min-height: var(--btn-h); padding: 12px 14px; margin-bottom: 8px; gap: 8px;
+  font-size: 16px; line-height: 1.45;
+}
+/* 门题的选项只留中文：8 条要在 430×932 的首屏里全露出来，
+   每行英文小字会多占 18–27px，一屏就装不下。中文里已带关键英文词。 */
+.qbody.gate .opt .lbl small { display: none; }
+/* 门题把题头上方压紧：英文原文在这题是重复信息（Part 2 Item 3 已由 chip 标明） */
+.card.question.gate { padding-top: 8px; }
+.card.question.gate .enbox { display: none; }
+/* 门题一屏要装 8 条选项：这一段题点条（两行 53px）让位，段名与分段进度仍在 */
+body.gate #topbar .dotsline { display: none; }
+/* 门题 8 条选项按新的 12px 内边距会一直排到 852px，底部固定的免责声明（821–855）
+   正好压在最后一条上。这一段也让位：开始页、完成页、其余题都有同一句免责声明。 */
+body.gate #foot { display: none; }
+.card.question.gate .hint {
+  font-size: 15px; line-height: 1.5; padding: 6px 12px; margin-bottom: 8px;
+}
+/* 「展开看说明」紧跟在引导句后面，不单独占一行 */
+.card.question.gate .hint details { display: inline; margin-top: 0; }
+.card.question.gate .hint summary { display: inline; min-height: 0; margin-left: 6px; }
+/* 「以上都不是」永远排最后，单独一条分隔线 + 加粗 */
+.qbody.gate .opt-none {
+  margin-top: 8px; position: relative; font-weight: 600;
+}
+.qbody.gate .opt-none::before {
+  content: ''; position: absolute; left: 0; right: 0; top: -4px;
+  border-top: 1px solid var(--line);
+}
+
+/* 输入 */
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 16px; line-height: 1.75; color: var(--ink-faint2); margin-bottom: 8px; }
+.field label small { display: block; color: var(--muted); font-size: 14px; line-height: 1.6; font-weight: 400; margin-top: 2px; }
+.field input[type="text"], .field input[type="number"], .field input[type="date"], .field select {
+  width: 100%; min-height: var(--btn-h); padding: 12px 14px;
+  font-size: 18px; line-height: 1.5; font-family: inherit;
+  color: var(--ink); background: var(--card);
+  border: 1px solid var(--line); border-radius: var(--radius-input); outline: none;
+}
+.field input:focus, .field select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.field .sub { font-size: 16px; line-height: 1.75; color: var(--muted); margin-top: 8px; }
+/* 国名 9 字符校验提示：与上方「请用英文或拼音填写」拉开 8px，14px 小字更省地方 */
+.field .sub.limitmsg { margin-top: 8px; font-size: 14px; line-height: 1.5; max-width: 21em; text-wrap: pretty; }
+.field .sub.limitmsg.bad { color: var(--danger); }
+
+/* 汇总 */
+.pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 var(--gap); }
+.pill {
+  font-size: 16px; padding: 5px 12px; border-radius: 999px;
+  background: var(--soft-gray); color: var(--ink-faint3);
+}
+.pill.ok { background: var(--soft-ok); color: var(--ok); }
+.pill.warn { background: var(--soft-warn); color: var(--warn); }
+
+/* ---------- 完成页：查验摘要两档卡片 ---------- */
+.tier {
+  background: var(--card); border: 0.5px solid var(--line);
+  border-radius: var(--radius-btn); padding: 16px 18px;
+}
+.tier + .tier { margin-top: var(--gap); }   /* 档间距 24px */
+.tier.t2 { border-left: 4px solid var(--danger); }
+.tier.t3 { border-left: 4px solid var(--tier3-line); }
+/* 档 1「这 N 题要回去核对」= warning 语义（要你当心），不是段色 */
+.tier.t1 { border-left: 4px solid var(--warn-border); }
+.tier-head { display: flex; align-items: center; gap: 8px; }
+/* 红档的 ⚠ 图标（v9 批 1）：色弱用户靠它区分红档与主色，不只靠色相。
+   纯文字符号 ⚠（U+26A0），不是 emoji（headless Chrome 会吞 emoji）。 */
+.tier-warn-icon { color: var(--danger); font-size: 18px; line-height: 1.4; flex: 0 0 auto; }
+.tier-head h3 {
+  font-size: 20px; font-weight: 600; line-height: 1.4; margin: 0;
+  text-wrap: balance;
+  /* 2026-11-09（L13-31 全盘扫同类）：这处原来也是 word-break: keep-all。
+     h2 那处改完后，这一处一起改 —— keep-all 在中文里等于禁止在汉字间断行，
+     档位标题（「这 N 题要回去核对」这类）一样可能撑宽窄屏。
+     两处口径统一：word-break: normal + overflow-wrap: break-word。 */
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+.tier-badge {
+  font-size: 14px; font-weight: 600; line-height: 1.6;
+  padding: 1px 10px; border-radius: 999px;
+  background: var(--soft-gray); color: var(--ink-faint3); white-space: nowrap;
+}
+.tier.t2 .tier-badge { background: var(--soft-danger); color: var(--danger); }
+.tier.t1 .tier-badge { background: var(--soft-warn); color: var(--warn); }
+.tier-why { font-size: 16px; line-height: 1.75; color: var(--muted); margin: 6px 0 0; }
+.tier-list { margin: 10px 0 0; padding-left: 20px; }
+.tier-list li { font-size: 16px; line-height: 1.7; margin-bottom: 6px; padding-left: 2px; }
+.tier-list li::marker { color: var(--muted); }
+.tier-list .needs-note { color: var(--muted); }
+
+/* ---------- 按钮 ---------- */
+.btn {
+  font-family: inherit; font-size: 18px; line-height: 1.2;
+  border-radius: var(--radius-btn); cursor: pointer; min-height: 44px;
+  padding: 12px 20px; border: 1px solid transparent; transition: .15s;
+}
+.btn.primary { background: var(--accent); color: var(--on-dark); }
+.btn.primary:hover { background: var(--accent-hover); }
+.btn.ghost { background: var(--card); color: var(--ink-mute); border-color: var(--line); }
+.btn.ghost:hover { border-color: var(--line-soft); }
+/* 次级按钮（2026-11-11 开始页四键）：描边 + 强调色文字，介于主按钮与 ghost 之间。
+   只给「导入答案」用；不引入新颜色令牌，描边/文字都走 --accent。 */
+.btn.secondary {
+  background: var(--card); color: var(--accent); border-color: var(--accent);
+}
+.btn.secondary:hover { background: var(--soft-gray); border-color: var(--accent-hover); color: var(--accent-hover); }
+/* 主按钮：全宽 56px 高，圆角 14px */
+.btn.big {
+  display: block; width: 100%; height: var(--btn-h); min-height: var(--btn-h);
+  padding: 0 20px; font-size: 18px; font-weight: 600; border-radius: var(--radius-btn);
+}
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+
+/* ---------- 开始页四键（2026-11-11 精简版）----------
+   竖排、同宽、主次分明：开始（实心主色）→ 导入（描边）→ 关于作者 / 源码（ghost）。
+   四个键同一宽度（= 卡片内容宽）；<a> 也按按钮渲染：flex 居中，去掉下划线。 */
+.intro-actions { display: flex; flex-direction: column; gap: 12px; margin: 4px 0 0; }
+.intro-actions .btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; text-align: center; text-decoration: none;
+}
+
+/* 开始页两行隐私小字（2026-11-11）：放在说明段与四键之间。
+   14px / 次级灰（与 .tiny 同色）/ 行高 1.6 / 左对齐 / 无项目符号；
+   一句一行，两行合计 ≤56px（2×22.4=44.8px）。窄屏也不给它换行错乱的空间，
+   所以 align-self 交给块级默认（满宽左侧起排），不做居中文字。 */
+.intro-notes { margin: 10px 0 0; text-align: left; }
+.intro-notes p {
+  margin: 0; padding: 0; list-style: none;
+  font-size: 14px; line-height: 1.6; color: var(--muted); text-align: left;
+}
+
+/* 顶栏「随时导出」按钮 —— 放在 .btn 之后：.btn 的 font-size:18px 会覆盖顶栏那行，
+   所以整段样式必须写在这里（同样特异性，后写的赢）。 */
+.btn.top-export {
+  flex: 0 0 auto;
+  font-size: 14px; line-height: 1.2; font-weight: 600;
+  height: 44px; min-height: 44px; padding: 0 14px;
+  border-radius: var(--radius-sm);
+  color: var(--ink-mute); background: var(--card); border-color: var(--line);
+  white-space: nowrap;
+}
+.btn.top-export:hover { border-color: var(--line-soft); }
+.btn.top-export:disabled { opacity: .45; cursor: not-allowed; }
+/* 只在答题页出现：开始页 / 切段过渡卡 / 完成页两屏都不显示 */
+body.intro .top-export,
+body.seg .top-export,
+body.done .top-export { display: none; }
+/* 2026-11-09 fix3：完成页只放开「目录」，「导出」继续隐藏。
+   完成页已有拿表屏的下载主按钮，再放一颗顶栏「导出」会重复；
+   但完成页仍要能翻目录改某题（否则只能先点「有要改的，回去接着答」）。
+   覆盖而不拆 .top-export 的规则：body.done #btnToc 特异性更高且在本行之后。 */
+body.done #btnToc { display: inline-block; }
+
+/* ---------- 目录面板（2026-11-09）---------- */
+/* 遮罩：点一下就关。不挡滚动条（overflow:auto 允许面板内滚动）。 */
+.toc-overlay {
+  position: fixed; inset: 0; z-index: 30;
+  background: var(--overlay);
+}
+/* 面板：从底部升起的一页清单（手机上占满高度，桌面上居中一块） */
+.toc-panel {
+  position: fixed; z-index: 31;
+  left: 0; right: 0; bottom: 0;
+  max-height: 88vh;
+  display: flex; flex-direction: column;
+  background: var(--card);
+  border-radius: var(--radius-panel) var(--radius-panel) 0 0;
+  border-top: 0.5px solid var(--line);
+  padding: 0 0 12px;
+  /* v9 批 8：面板本身可纵向滚动。
+     以前只有 .toc-list 是滚动容器，面板 overflow 是 visible：
+     视口极矮时（实测 800×400），.toc-list 被 flex 压成 12px 高，
+     底部那块（.toc-about）展开后落在面板底边之外 → 邮箱行被裁掉、
+     且面板虽然 scrollHeight > clientHeight 却滚不动（visible 不可滚）。
+     改成面板自己 overflow-y:auto：内容超出时滚面板就能看全，
+     正常高度下（430×932 / 1280×900）内容不溢出，滚动条不出现、版式不变。 */
+  overflow-y: auto;
+}
+.toc-panel[hidden] { display: none; }
+@media (min-width: 721px) {
+  .toc-panel {
+    left: 50%; right: auto; bottom: auto; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 720px; max-width: calc(100vw - 32px);
+    max-height: 82vh;
+    border-radius: var(--radius-panel);
+    border: 0.5px solid var(--line);
+  }
+}
+.toc-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 14px 16px 6px;
+  border-bottom: 0.5px solid var(--line);
+}
+.toc-head-title { font-size: 20px; font-weight: 700; }
+.toc-close {
+  font-family: inherit; font-size: 26px; line-height: 1;
+  width: 44px; height: 44px; border-radius: var(--radius-sm);
+  border: 1px solid var(--line); background: var(--card); color: var(--ink-mute);
+  cursor: pointer;
+}
+.toc-close:hover { border-color: var(--line-soft); }
+.toc-note {
+  margin: 0; padding: 8px 16px;
+  font-size: 14px; line-height: 1.6; color: var(--muted);
+}
+.toc-note b { color: var(--ink-mute); }
+/* 目录里的「回看查验结果」固定条目（v9 批 7）：单独一行、题目清单上方，
+   与题目条目明显区分 —— 强调色文字 + 一条细分隔线 + 右侧箭头。
+   空态也显示：现有实现本来就允许空态进核对页（v9-batch3a 的 F4 全空态用例），
+   所以这里不做「有答案才显示」的分支，保持与现有行为一致。 */
+.toc-sheet {
+  display: block; width: 100%; text-align: left;
+  font-family: inherit; font-size: 15px; font-weight: 600; line-height: 1.5;
+  color: var(--accent); background: transparent;
+  border: 0; border-bottom: 0.5px solid var(--line);
+  padding: 12px 16px; cursor: pointer;
+}
+.toc-sheet::after { content: ' →'; }
+.toc-sheet:hover { background: var(--t-hint-bg); }
+.toc-sheet:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.toc-list {
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: 4px 16px 8px;
+}
+/* ---------- 目录底部的「关于作者」（v9 批 8）----------
+   挂载点在 #tocList 之后（目录面板最下面）。内容由 app.js 从开始页那份
+   #aboutIntro 克隆而来 —— 这里只管版式，不含任何作者文案。
+   版式跟面板内其它条目同族：左边缘与题目清单对齐（padding 16px）、
+   上方一条细分隔线、summary 14px 灰字（与 .toc-note / .about summary 同级）。
+   展开后：内容不撑破面板（面板本身可滚动）、
+   邮箱等长串用 overflow-wrap 断开（窄屏不出血、不出横向滚动条）。 */
+.toc-about {
+  border-top: 0.5px solid var(--line);
+  padding: 10px 16px 0;
+  flex: 0 0 auto;
+  /* 极矮视口下：.toc-list 被 flex 压到几乎 0 高，这块必须保留自身高度，
+     否则展开后内容会被面板底边裁掉（实测 800×400）。 */
+  min-height: 0;
+}
+.toc-about .about {
+  margin: 0;
+  max-width: none;
+}
+.toc-about .about summary {
+  font-size: 14px;
+}
+.toc-about .about-body { margin-top: 6px; }
+.toc-about .about-body p {
+  max-width: none;
+  overflow-wrap: anywhere;
+}
+/* 一段 = 一个分组 */
+.toc-seg { margin: 0 0 14px; }
+/* 段标题行：第 N 段 + 题数一行，段名另起一行。
+   （原来三块挤在同一行：段名一长就折成两行，整行高度忽高忽低，
+     题数徽标贴着折行处，看起来像叠在一起。改成段名独占一行，高度就齐了。） */
+.toc-seg-head {
+  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+  font-size: 16px; font-weight: 600; color: var(--ink-mute);
+  padding: 6px 0 4px;
+  border-bottom: 0.5px solid var(--line);
+}
+.toc-seg-n { color: var(--accent); font-variant-numeric: tabular-nums; }
+.toc-seg-name {
+  flex: 1 1 100%;          /* 段名另起一行 */
+  font-weight: 500; color: var(--ink-mute);
+}
+.toc-seg-count { margin-left: auto; font-size: 14px; font-weight: 400; color: var(--muted); }
+/* 一道题 = 一行：编号 + 题面简写（截断到一行）+ 状态标记 */
+.toc-item {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; min-height: 44px;
+  padding: 6px 8px; margin: 2px 0;
+  font-family: inherit; font-size: 15px; line-height: 1.5; text-align: left;
+  background: transparent; color: var(--ink);
+  border: 1px solid transparent; border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.toc-item:hover { background: var(--soft-gray); }
+.toc-item:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.toc-no {
+  flex: 0 0 auto; min-width: 42px;
+  font-size: 13px; font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+/* 题面简写：截断到一行（不换行、不撑宽） */
+.toc-text {
+  flex: 1 1 auto; min-width: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* 状态标记：已答 / 未答 / 不确定 */
+.toc-state {
+  flex: 0 0 auto;
+  font-size: 12px; font-weight: 600; line-height: 1.6;
+  padding: 1px 8px; border-radius: 999px;
+  white-space: nowrap;
+}
+.toc-state[data-state="answered"] { background: var(--soft-ok2); color: var(--ok); }
+.toc-state[data-state="unanswered"] { background: var(--soft-gray); color: var(--muted); }
+.toc-state[data-state="uncertain"] { background: var(--soft-warn); color: var(--warn); }
+/* 当前所在题 */
+.toc-item.is-current { background: var(--accent-soft); border-color: var(--line-soft); }
+.toc-item.is-current .toc-no { color: var(--accent); font-weight: 700; }
+
+/* ---------- 导出三选项面板（v9 批 9）----------
+   与目录面板同族：直接复用 .toc-panel / .toc-overlay / .toc-head / .toc-close，
+   本节只补「三行选项」自己的排版，**不引入任何新颜色**（全部用现有令牌）。
+   移动端从底部升起、桌面居中 —— 与目录面板同一套定位规则。 */
+.exp-list { padding: 4px 16px 8px; overflow-y: auto; }
+/* 一条 = 一行（标题 + 说明小字），点哪条执行哪条 */
+.exp-item {
+  display: block; width: 100%; text-align: left;
+  font-family: inherit; font-size: 16px; line-height: 1.5;
+  background: transparent; color: var(--ink);
+  border: 0; border-bottom: 0.5px solid var(--line);
+  padding: 12px 8px; cursor: pointer;
+}
+.exp-item:last-child { border-bottom: 0; }
+.exp-item:hover { background: var(--t-hint-bg); }
+.exp-item:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.exp-item-title { display: block; font-weight: 600; color: var(--accent); }
+/* 说明小字：「导出进度」那条必须带一行指导（换设备 → 导入 → 接着上次的进度） */
+.exp-item-hint {
+  display: block; margin-top: 3px;
+  font-size: 14px; font-weight: 400; line-height: 1.6; color: var(--muted);
+}
+
+/* ---------- 底栏 ---------- */
+#navbar {
+  /* v9 批 7：页脚钉在最底部，底栏抬到页脚正上方（--foot-h 由 fitFooter() 实测写入）。
+     安全区已由页脚的下内边距吃掉，这里不再加一次 env()，否则 iPhone 上会双倍留白。 */
+  position: fixed; bottom: var(--foot-h, 45px); left: 0; right: 0; z-index: 20;
+  display: flex; gap: 12px;
+  padding: 10px 16px;
+  background: var(--card);
+  border-top: 0.5px solid var(--line);
+  max-width: 720px; margin: 0 auto;
+}
+#navbar .btn {
+  /* v9 批 4：按钮圆角按 12:10 定稿 mockup 逐套取值
+     （B 14px · C 6px · A 2px）。
+     v9 批 5：字号对齐 mockup 的 .btn（16px / 行高 1.5）。 */
+  height: var(--btn-h); min-height: var(--btn-h); border-radius: var(--t-btn-r, 14px);
+  font-size: 16px; line-height: 1.5; font-weight: 600;
+}
+/* 底栏两颗按钮的底色按 mockup 的 .prev / .next 逐套取值。
+   C 的下一题按钮底 = 墨色（不跟强调色湖蓝走），悬停用 mockup 的 ink2。 */
+#navbar #btnPrev { flex: 1 1 0; background: var(--t-prev-bg, var(--card)); }
+#navbar #btnNext { flex: 1.8 1 0; }
+#navbar #btnNext {
+  background: var(--t-next-bg, var(--accent));
+  color: var(--t-next-fg, var(--on-dark));
+  border-color: transparent;
+}
+#navbar #btnNext:hover { background: var(--t-next-bg-hover, var(--accent-hover)); }
+body.intro #navbar, body.done #navbar { display: none; }
+
+/* 页脚（v9 批 7）：钉死在视口左下角最底部的一条，左对齐、底色不透明。
+   改前两个根因：
+     ① `background-color: inherit` → 计算值是 rgba(0,0,0,0)，
+        正文滚到页脚底下会整段透出来（老板原话「浮在文字上面」）；
+     ② `.theme-dots{margin-left:auto}` 把色点推到行末右侧，不是左下角。
+   现在：
+     · 底色 = 当前皮肤的页面底 --t-bg（实色，三套都不是 rgba(...0)）；
+     · 一条 flex 行、左对齐；窄屏放不下时自然换到第二行，仍是左对齐；
+     · 高度不写死：app.js 的 fitFooter() 实测 offsetHeight 后写进 --foot-h，
+       底栏 #navbar 抬到页脚正上方，#stage 的 padding-bottom 也按
+       页脚 + 底栏 + 12px 净空重算 —— 滚到底时最后一块内容一定在页脚上方。
+     · env(safe-area-inset-bottom) 保留在页脚自己的下内边距里；
+       底栏在它上方，不再重复加一次安全区。 */
+#foot {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 21;
+  display: flex; align-items: center; flex-wrap: wrap;
+  gap: 4px 12px;
+  /* 左内边距 = 舞台 16px + 卡片 20px；宽屏时跟随居中的舞台 */
+  padding: 8px max(36px, calc((100% - 720px) / 2 + 36px)) calc(8px + env(safe-area-inset-bottom));
+  background: var(--t-bg);      /* 不透明：不许再写 inherit / transparent */
+  border-top: 0.5px solid var(--line);
+}
+body.done #foot { display: none; }
+/* 拿表屏（v9 批 7）：brief 要求拿表屏也检查页脚 —— 它带 body.done（隐藏底栏），
+   但页脚要留着（三件 + 颜色模板）。放在 body.done 规则之后、特异性更高。 */
+body.done.handoff #foot { display: flex; }
+/* 开始页没有底栏：页脚同样钉底，只是不需要给底栏让位（fitFooter 量到 0）。 */
+body.intro #foot { border-top: 0.5px solid var(--line); }
+/* 开始页的「技术说明」单独占一行（flex-basis:100% + order:-1）：
+   否则它会和免责声明挤在同一行，把免责声明从左边缘推到它右边
+   （v9-batch1-7 的 B6 左边缘断言实测 108.02 ≠ 36 就是这条）。
+   技术说明单独一行后，第二行才是「免责声明 + 颜色模板」，仍左对齐。 */
+body.intro #foot .tech { flex: 1 0 100%; order: -1; margin: 0 0 2px; }
+/* 免责声明三处统一：左对齐、与卡片正文同一条左边缘、13px 灰字 */
+#footDisc { text-align: left; margin: 0; font-size: 13px; color: var(--muted); }
+/* 完成页用的是卡片内的 #doneDisc，复制同一套外观保证三处一致 */
+#doneDisc { text-align: left; margin: 0; font-size: 13px; color: var(--muted); }
+/* 完成页「免责声明 → 分隔线 → 返回检查」收紧到 20.5px 空白（原 49px） */
+#doneDisc + hr { margin: 10px 0; }
+body.intro #stage { padding-bottom: 12px; display: flex; flex-direction: column; }
+
+/* ---------- 开始页：卡片垂直居中（2026-11-11 老板定）----------
+   改前：卡片贴可视区上沿，屏幕下半部空一大块，重心偏上。
+   做法：body.intro 下 #stage 已是 column flex（上一条），给开始页那一屏加纵向 auto 外边距 ——
+   剩余空间被上下两份均分，卡片落在「顶栏底 → 页脚顶」这段可视区的正中。
+   用 auto 外边距而不是 justify-content:center：内容比可视区高时，auto 外边距按规范
+   解析为 0，卡片从可视区顶边开始、往下正常滚；justify-content:center 会把标题顶出屏幕，
+   而溢出到顶上的那部分永远滚不回来。
+   只挂在 #view-intro.active 上：答题 / 切段 / 完成 / 拿表 / 核对五屏的布局一个像素不动。
+   页脚是 fixed，位置不受影响（技术说明 / 免责声明 / 颜色模板仍在最底部）。 */
+body.intro #view-intro.active { margin-block: auto; }
+
+/* 矮视口（≤700px 高，如 360×640）：开始页压缩纵向节奏，保证整屏不出现纵向滚动。
+   只收紧卡片内边距 / 外边距 / 按钮间距，以及说明段在矮屏的行高（1.75 → 1.5）；
+   字号（h1 28 / 说明段 18 / 小字 14）、按钮高度（--btn-h 56px）、文案一律不动 ——
+   四键仍是各 56px。
+   700px 阈值 = 常规节奏刚好放不下的高度：卡片 558 + 顶栏 40.5 + 页脚 93.84 ≈ 692。
+   430×932 / 390×844 两档视口高 >700，本段不生效，那两档样式一个像素不变。 */
+@media (max-height: 700px) {
+  body.intro #view-intro .card { padding-block: 8px; }
+  body.intro #view-intro h1 { margin-bottom: 6px; }
+  body.intro #view-intro .lead { margin-bottom: 8px; line-height: 1.5; }
+  body.intro #view-intro .intro-notes { margin-top: 0; }
+  body.intro #view-intro .intro-actions { margin-top: 0; gap: 8px; }
+  body.intro #view-intro .io-msg { margin-top: 0; }
+}
+
+/* ---------- 皮肤切换色点（v9 批 1）----------
+   署名已删（v9 批 1.7：四处署名全删，页脚只剩左侧免责声明一行）。 */
+
+/* 皮肤切换色点：三个 12px 圆点，无文字（aria-label 给中文名）。
+   放在页脚**右侧**（v9 批 1 修 Y10：原来在左侧，规格要求右侧）。
+   margin-left: auto —— 它们是独立一行（#foot 是块级），靠这个推到行末。 */
+/* 色点组（v9 批 7）：可见文字「颜色模板」+ 三个放大后的色点，整组左对齐。
+   色点直径取 22px：brief 要求 20–24px；22px 在 1x / 2x 屏上都是偶数像素，
+   不会出现 0.5px 抗锯齿毛边，同时比 20px 更容易看见、又比 24px 不挤。
+   点击区 = 22px + 左右各 6px 伪元素 = 34px（≥24px 的可点下限）。 */
+.theme-dots-wrap { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; }
+.theme-dots-label { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.theme-dots { display: flex; align-items: center; gap: 18px; flex: 0 0 auto; }
+.theme-dot {
+  width: 22px; height: 22px; border-radius: 50%; padding: 0;
+  border: 1px solid var(--line); cursor: pointer; display: block;
+  background: var(--dot-color);
+  /* 点击区放大到 34px，视觉仍是 22px 圆点 */
+  position: relative;
+}
+.theme-dot::after {
+  content: ''; position: absolute; left: -6px; right: -6px; top: -6px; bottom: -6px;
+}
+.theme-dot:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.theme-dot[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--card), 0 0 0 3.5px var(--ink-mute); }
+/* 三套色点的颜色：读 theme.css 的 --dot-* 令牌（写在 style.css 里就是第二个事实源）。 */
+.theme-dot[data-theme="shenqing"] { --dot-color: var(--dot-shenqing); }
+.theme-dot[data-theme="nuanzhu"]  { --dot-color: var(--dot-nuanzhu); }
+.theme-dot[data-theme="wenshu"]   { --dot-color: var(--dot-wenshu); }
+
+/* ---------- 「已自动保存 · HH:MM」（v9 批 1）----------
+   仅答题页显示（body 不带 intro / seg / done 三类时）。
+   位置：底栏上方那行，左边距与卡片对齐。13px 灰字。 */
+.savetime {
+  font-size: 13px; color: var(--muted); margin: 0 0 6px;
+  text-align: left; line-height: 1.6;
+  font-variant-numeric: tabular-nums;
+}
+body.intro .savetime, body.seg .savetime, body.done .savetime { display: none; }
+
+/* ---------- 导出 / 导入入口（v9 批 1）----------
+   文字链接，不做大按钮。开始页 + 拿表屏各一个。 */
+.io-links {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  margin: 10px 0 0;
+}
+.io-link {
+  font-family: inherit; font-size: 16px; line-height: 1.75;
+  color: var(--accent); background: none; border: 0; padding: 4px 0;
+  min-height: 32px; cursor: pointer; text-decoration: underline;
+}
+.io-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.io-link[disabled] { opacity: .45; cursor: not-allowed; }
+/* 隐藏的文件输入（只由链接触发） */
+.io-file { display: none; }
+/* 导入/导出的中文提示行（错误也走这里，不静默失败） */
+.io-msg { font-size: 14px; line-height: 1.6; margin: 6px 0 0; color: var(--muted); }
+.io-msg.bad { color: var(--danger); }
+.io-msg.ok { color: var(--ok); }
+
+/* ---------- 关于作者（v9 批 1.7）----------
+   原生 <details>，默认收起；外观跟「技术说明」同一套：13–16px、--muted 级灰。
+   入口两处：开始页（开始填表卡片底部）+ 拿表屏（免责声明上方）。
+   邮箱只写 [at] / [dot] 形式，「复制」是小文字按钮，走 navigator.clipboard。
+   内容只有一份事实源（#aboutIntro），拿表屏那份由 app.js 克隆。 */
+.about { margin: 12px 0 0; max-width: 22em; }
+.about summary {
+  font-size: 14px; color: var(--muted); line-height: 1.7; cursor: pointer;
+  list-style: none; text-align: left;
+}
+.about summary::-webkit-details-marker { display: none; }
+/* 箭头「▾」直接写在 HTML 的 summary 文字里（brief：summary 文字固定为「关于作者 ▾」），
+   所以这里**不**再用 ::after 生成箭头，也不随展开翻折 —— 与「技术说明」的区别就在这一点。 */
+.about-body { margin: 6px 0 0; }
+.about-body p {
+  font-size: 13px; color: var(--muted); line-height: 1.75;
+  margin: 0; text-align: left;
+  /* 卡片里的 p 默认 22em（≈286px），邮箱行 + ［复制］放不下一行 → 这里放开 */
+  max-width: none;
+  /* 邮箱行：地址 + ［复制］按钮并排，长地址用 overflow-wrap 断开（窄屏不出血） */
+  overflow-wrap: anywhere;
+}
+.about-body p + p { margin-top: 2px; }
+.about-name { font-weight: 600; }
+/* 邮箱行：「［复制］」跟在地址后面（HTML 里已留一个空格，这里不再加额外 margin） */
+.about-mail .about-copy { margin-left: 0; }
+.about-copy {
+  font-family: inherit; font-size: 13px; line-height: 1.75;
+  color: var(--accent); background: none; border: 0; padding: 2px 4px;
+  min-height: 24px; cursor: pointer; text-decoration: underline;
+  /* 按钮跟着正文走：中文小字不要继承按钮的默认行高 */
+  white-space: nowrap;
+}
+.about-copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* 拿表屏的挂载点：只是个容器，不产生额外盒子（display:contents） */
+#aboutHandoffSlot { display: contents; }
+/* 复制结果的中文提示行：成功/失败都不静默 */
+.about-msg:empty { display: none; }
+.about-msg.ok { color: var(--ok); }
+.about-msg.bad { color: var(--danger); }
+
+/* 关于作者面板（2026-11-11）：开始页那颗「关于作者」按钮打开的面板。
+   内容就是 #aboutIntro 本体（唯一事实源），在面板里强制展开、隐藏 summary 行；
+   拿表屏 / 目录面板那两份克隆体仍是可折叠的 <details>，不受这条影响。 */
+.about-panel { padding-bottom: 20px; }
+.about-panel-body { padding: 12px 16px 0; }
+#aboutPanel .about { margin: 0; max-width: none; }
+#aboutPanel .about summary { display: none; }
+#aboutPanel .about-body { margin: 0; }
+
+/* 技术说明：默认收起，13px 灰字，不占正文注意力 */
+.tech { margin: 0 0 6px; max-width: none; }
+/* 开始页页脚：内边距由 #foot 统一给，技术说明与免责声明自然同一条左边缘 */
+body.intro .tech { padding: 0; }
+/* 答题页页脚是 fixed 覆盖层：技术说明一旦展开会盖住选项，所以只在开始页显示。
+   完成页整个页脚已隐藏（body.done #foot）。 */
+body:not(.intro) .tech { display: none; }
+.tech summary {
+  font-size: 13px; color: var(--muted); line-height: 1.7; cursor: pointer;
+  list-style: none; text-align: left;
+}
+.tech summary::-webkit-details-marker { display: none; }
+.tech summary::after { content: ' ▾'; font-size: 11px; }
+.tech[open] summary::after { content: ' ▴'; }
+.technote {
+  font-size: 13px; color: var(--muted); line-height: 1.7;
+  margin: 6px 0 0; text-align: left;
+}
+
+/* ---------- toast ---------- */
+.toast {
+  position: fixed; left: 50%; bottom: 92px; transform: translateX(-50%);
+  background: var(--dark-bg); color: var(--on-dark); padding: 11px 16px; border-radius: 12px;
+  font-size: 16px; line-height: 1.75; max-width: 88vw; z-index: 40;
+}
+
+/* ---------- 其它 ---------- */
+.subline { font-size: 16px; color: var(--muted); margin-top: 12px; }
+.err { color: var(--danger); font-size: 16px; line-height: 1.75; white-space: pre-wrap; }
+
+/* 完成页「还有 N 条」展开按钮：看起来像链接，点击区仍够大 */
+.morelink {
+  /* 看起来像链接，点击区必须 ≥44×44 */
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 44px; min-height: 44px;
+  margin: 4px 0 0; padding: 10px 8px;
+  background: none; border: 0; cursor: pointer;
+  font-family: inherit; font-size: 16px; line-height: 1.75;
+  color: var(--accent); text-decoration: underline;
+}
+/* 「有要改的，回去接着答」：结果屏底部的小字链接 */
+.backlink-wrap { margin: 12px 0 0; text-align: center; }
+.backlink {
+  color: var(--accent); text-decoration: underline;
+  display: inline-block; padding: 8px 4px; min-height: 44px;
+  line-height: 1.75;
+}
+/* 结果屏底部的主按钮：与下一步一步走 */
+.next-step { margin-top: var(--gap); }
+.noteWarn { color: var(--warn); }
+.noteErr { color: var(--danger); }
+
+/* ---------- Part 9 答「是」的即时提示 ----------
+   位置：题卡内、选项区下方、底部按钮上方。
+   样式：左边 4px 竖条（--warn-border）+ var(--soft-warn) 底 + var(--warn) 字，16px / 行高 1.75，圆角 10px。
+   竖条用 --warn-border 令牌：与 .hint.warn / .uncertain-btn.marked / .tier.t1 同值，
+   全站 warning 边框只此一个 hex（2026-11-09 统一）。 */
+.live-warn {
+  font-size: 16px; line-height: 1.75; color: var(--warn);
+  background: var(--soft-warn);
+  border-left: 4px solid var(--warn-border);
+  padding: 10px 14px; border-radius: 10px;
+  margin: 12px 0 0;
+  max-width: 22em;
+  text-wrap: pretty;
+}
+
+/* ---------- 完成页：拿到 PDF 之后怎么走 ---------- */
+/* 🔴 2026-11-09 中途导出（半成品）警告块：
+   拿表屏的 #exportNote 在中途导出时是「这是半成品，先别寄」的警告块，
+   视觉上必须压过下面那颗 56px 蓝色主按钮「下载填好的表」——
+   否则客户一眼只看到「下载 → 打印 → 寄走」。
+   做法：浅橙底 + 4px 左侧竖条（--warn-border）+ 首句加粗（.export-note-head）。
+   完整路径下这个元素是 hidden，不占位。 */
+.export-note {
+  font-size: 16px; line-height: 1.75; color: var(--danger-ink);
+  background: var(--soft-warn);
+  border-left: 4px solid var(--warn-border);
+  padding: 12px 14px; border-radius: 10px;
+  margin: 0 0 var(--gap);
+  max-width: 22em;
+}
+.export-note[hidden] { display: none; }
+/* 首句（加粗）：「这是半成品，先别寄！」 —— 整块里最扎眼的一句 */
+.export-note .export-note-head {
+  display: block; font-weight: 700; font-size: 18px; line-height: 1.6;
+  color: var(--warn); margin-bottom: 2px;
+}
+/* 「拿到 PDF 之后怎么走」的条目：半成品路径下整条隐藏（JS 设 hidden） */
+.guide-box li[hidden] { display: none; }
+.guide-box p[hidden] { display: none; }
+.guide-box { margin-top: 16px; border-top: 0.5px solid var(--line); padding-top: 16px; }
+.guide-box h2 { margin: 0 0 16px; }
+.guide { padding-left: 20px; margin: 0; }
+.guide li { margin: 0 0 16px; max-width: 22em; }
+.guide li b { display: block; font-weight: 600; }
+.guide li span { display: block; color: var(--muted); font-size: 16px; line-height: 1.75; }
+.guide-note { margin: 8px 0 0; max-width: 22em; }
+.guide-sign { margin: 12px 0 0; max-width: 22em; color: var(--warn); font-size: 16px; line-height: 1.75; }
+.guide-sign b { font-weight: 600; }
+/* 完成页两个下载按钮：移动端竖排，不互相挤压（各自 56px 高 + 10px 间距） */
+.dl-row { margin: 16px 0 8px; display: flex; flex-direction: column; gap: 10px; }
+.dl-row .btn { width: 100%; }
+/* 每个下载按钮 + 它下面那行用途说明，算一个整体 */
+.dl-item { display: flex; flex-direction: column; gap: 6px; }
+.dl-item .btn { width: 100%; }
+/* 用途说明：14px 灰字，告诉用户这份 PDF 是干什么的 */
+.dl-hint {
+  font-size: 14px; line-height: 1.6; color: var(--muted);
+  margin: 0; max-width: 22em;
+}
+@media (min-width: 720px) {
+  .dl-row { flex-direction: row; }
+  .dl-row .dl-item { flex: 1 1 0; }
+}
+/* ---------- 手填清单行距（v9 批 1 修 Y17）----------
+   原来（11-09）：li 之间 16px。
+   v9 批 1 误改成 10px —— **方向错了**：本意是把清单排松，10px 反而更挤。
+   现在：li 之间恢复 16px；真正挤的是「小标题（li b）与后面说明粘在一起」，
+   所以把 li b 改成块级 + 4px 下间距（标题自己占一行）。
+   小标题（.hw-title）与下面说明（#hwIntro）之间保持 4px。 */
+.hw-title { font-size: 20px; line-height: 1.4; margin: 24px 0 4px; }
+.hwlist { padding-left: 20px; margin: 0; }
+.hwlist li { font-size: 16px; line-height: 1.75; margin-bottom: 16px; max-width: 22em; }
+/* 小标题块级 + 4px 下间距：标题与它下面的说明分开（Y17 的真正诉求） */
+.hwlist li b { font-weight: 600; display: block; margin-bottom: 4px; }
+.hwlist li details { margin-top: 4px; }
+.hwlist li summary { font-size: 14px; color: var(--accent); cursor: pointer; }
+.hwlist .hwmore { margin: 8px 0 0; color: var(--ink-faint4); }
+
+/* ---------- 答案核对页（v9 批 3a） ----------
+   一页清单：顶部计数 + 按 8 段分组 + 每条一行（题号 / 题目 / 答案）。
+   颜色全部读 theme.css 令牌；这里不写死任何颜色值。 */
+.sheet-top { display: flex; justify-content: flex-start; margin: 0 0 10px; }
+.sheet-back { padding: 6px 12px; font-size: 15px; }
+.sheet-link-wrap { margin: 12px 0 0; text-align: center; }
+.answer-sheet { color: var(--ink); }
+.as-title { margin: 0 0 6px; }
+.as-count {
+  font-size: 16px; line-height: 1.7; color: var(--ink-soft);
+  margin: 0 0 16px; max-width: none;
+}
+.as-count b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.as-empty {
+  font-size: 16px; line-height: 1.75; color: var(--muted);
+  background: var(--soft-gray2);
+  border-left: 4px solid var(--line-neutral);
+  padding: 10px 14px; border-radius: 10px;
+  margin: 12px 0 0; max-width: none;
+}
+.as-seg { margin: 24px 0 0; break-inside: avoid; page-break-inside: avoid; }
+.as-seg-h {
+  font-size: 16px; line-height: 1.6; font-weight: 600; color: var(--muted);
+  border-bottom: 0.5px solid var(--line);
+  padding: 0 0 6px; margin: 0 0 4px; max-width: none;
+}
+.as-list { list-style: none; margin: 0; padding: 0; }
+.as-row {
+  display: grid;
+  grid-template-columns: 3.6em minmax(0, 1fr) minmax(7em, 32%) auto;
+  gap: 4px 12px;
+  align-items: baseline;
+  padding: 11px 0;
+  border-bottom: 0.5px solid var(--line-soft);
+  font-size: 16px; line-height: 1.6;
+  break-inside: avoid; page-break-inside: avoid;
+}
+.as-no {
+  color: var(--muted); font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.as-q { color: var(--ink); word-break: break-word; }
+.as-a { color: var(--accent); font-weight: 600; word-break: break-word; }
+.as-a-empty { color: var(--muted); font-weight: 400; }
+.as-tag {
+  font-size: 12px; line-height: 1.2;
+  padding: 2px 7px; border-radius: 6px;
+  color: var(--warn); background: var(--soft-warn);
+  border: 0.5px solid var(--warn-border);
+  white-space: nowrap;
+}
+.as-foot {
+  margin: 24px 0 0; padding-top: 10px;
+  border-top: 0.5px solid var(--line);
+  font-size: 13px; line-height: 1.7; color: var(--muted);
+  max-width: none;
+}
+/* 窄屏：题号占第一列，题目独占整行，答案折到下一行；不横向溢出 */
+@media (max-width: 560px) {
+  .as-row { grid-template-columns: 3.2em minmax(0, 1fr) auto; gap: 2px 10px; }
+  .as-q { grid-column: 2 / -1; }
+  .as-a { grid-column: 2; }
+  .as-tag { grid-column: 3; justify-self: start; }
+}
+
+/* ---------- 打印：答案核对页 ----------
+   只保留正文清单：顶栏进度条、底栏、页脚、返回按钮、toast 全部不打印。
+   正文黑白可读（沿用墨色令牌，去掉强调色）；每条答案不跨页断开。 */
+@media print {
+  #topbar, #navbar, #foot, .seg-banner, #toast, #tocPanel, #tocOverlay,
+  #expPanel, #expOverlay, .sheet-top, .sheet-back {
+    display: none !important;
+  }
+  html, body {
+    background: var(--card) !important;
+    color: var(--ink) !important;
+  }
+  body { display: block; }
+  #stage { max-width: none; margin: 0; padding: 0 !important; }
+  .view { display: none !important; }
+  #view-sheet.active { display: block !important; }
+  .card { border: 0; border-radius: 0; padding: 0; }
+  .answer-sheet { color: var(--ink); }
+  .as-title { font-size: 22px; margin: 0 0 6px; }
+  .as-count { color: var(--ink); margin-bottom: 12px; }
+  .as-count b { color: var(--ink); }
+  .as-empty { color: var(--ink); background: transparent; border-left: 0.5pt solid var(--ink); }
+  .as-seg-h { color: var(--ink); border-bottom: 0.5pt solid var(--line); }
+  .as-row {
+    border-bottom: 0.5pt solid var(--line-soft);
+    font-size: 12pt;
+    break-inside: avoid; page-break-inside: avoid;
+  }
+  .as-no, .as-q, .as-a, .as-a-empty, .as-foot { color: var(--ink); }
+  .as-tag {
+    color: var(--ink); background: transparent;
+    border: 0.5pt solid var(--ink);
+  }
+  .as-foot { border-top: 0.5pt solid var(--line); }
+}

@@ -1,0 +1,2104 @@
+{
+ "generatedAt": "2026-11-09T18:34:01.713Z",
+ "sourcePdf": "vendor/fillvisa-i485/fillvisa_i-485-acro.pdf",
+ "sourcePdfSha256": "330a28d41e8b6ff1f6ab6b90363836dd74ddcfbc25c86d9a8c7cb57c2490f7e2",
+ "rule": "所有 PDF 可填格 − 题库任一题可能写入的格 − 表单内部元数据 = 需要用户手写的格",
+ "totalFields": 315,
+ "parts": [
+  {
+   "id": "info-about-you",
+   "no": 1,
+   "title": "Part 1 · 关于你（Information About You）",
+   "count": 141,
+   "cats": [
+    "姓名",
+    "A-Number",
+    "护照/证件号",
+    "SSN",
+    "地址",
+    "其他"
+   ],
+   "fields": [
+    "a-number",
+    "a-number-1",
+    "a-number-10",
+    "a-number-11",
+    "a-number-12",
+    "a-number-13",
+    "a-number-14",
+    "a-number-15",
+    "a-number-16",
+    "a-number-17",
+    "a-number-18",
+    "a-number-19",
+    "a-number-2",
+    "a-number-20",
+    "a-number-21",
+    "a-number-22",
+    "a-number-23",
+    "a-number-24",
+    "a-number-25",
+    "a-number-26",
+    "a-number-27",
+    "a-number-3",
+    "a-number-4",
+    "a-number-5",
+    "a-number-6",
+    "a-number-7",
+    "a-number-8",
+    "a-number-9",
+    "a_number_no",
+    "a_number_yes",
+    "alien_crewman_no",
+    "alien_crewman_yes",
+    "city_of_birth",
+    "consent_disclosure_no",
+    "consent_disclosure_yes",
+    "country_of_birth",
+    "country_of_citizenship",
+    "current_flr",
+    "current_immigration_expiration_date",
+    "current_immigration_status",
+    "dob",
+    "first_name",
+    "i94-number",
+    "i94_expiration_date",
+    "i94_firstname",
+    "i94_lastname",
+    "i94_status",
+    "join_crewman_no",
+    "join_crewman_yes",
+    "last_arrival_first_no",
+    "last_arrival_first_yes",
+    "last_name",
+    "mailing_address_no",
+    "mailing_address_yes",
+    "mailing_apt",
+    "mailing_city",
+    "mailing_flr",
+    "mailing_incare_of_name",
+    "mailing_number",
+    "mailing_state",
+    "mailing_ste",
+    "mailing_street",
+    "mailing_zip",
+    "middle_name",
+    "other_a_number_no",
+    "other_a_number_yes",
+    "other_anumber_1",
+    "other_anumber_2",
+    "other_dob_1",
+    "other_dob_2",
+    "other_dob_no",
+    "other_dob_yes",
+    "othername_firstname_1",
+    "othername_firstname_2",
+    "othername_lastname_1",
+    "othername_lastname_2",
+    "othername_middlename_1",
+    "othername_middlename_2",
+    "outside_prior_number",
+    "outside_prior_zip",
+    "passport_expiration_date",
+    "passport_issued_country",
+    "passport_number",
+    "physical_apt",
+    "physical_city",
+    "physical_incare_of_name",
+    "physical_number",
+    "physical_reside_date",
+    "physical_state",
+    "physical_ste",
+    "physical_street",
+    "physical_zip",
+    "prior_apt",
+    "prior_city",
+    "prior_country",
+    "prior_flr",
+    "prior_incare_of_name",
+    "prior_number",
+    "prior_postal",
+    "prior_province",
+    "prior_reside_date_from",
+    "prior_reside_date_to",
+    "prior_state",
+    "prior_ste",
+    "prior_street",
+    "prior_zip",
+    "recent_apt",
+    "recent_city",
+    "recent_country",
+    "recent_flr",
+    "recent_number",
+    "recent_postal",
+    "recent_province",
+    "recent_reside_date_from",
+    "recent_reside_date_to",
+    "recent_state",
+    "recent_ste",
+    "recent_street",
+    "recent_zip",
+    "residing_address_no",
+    "residing_address_yes",
+    "sex_female",
+    "sex_male",
+    "ssn_issued_no",
+    "ssn_issued_yes",
+    "ssn_new_no",
+    "ssn_new_yes",
+    "ssn_number",
+    "usa_arrival_city",
+    "usa_arrival_date",
+    "usa_arrival_inspected_admitted",
+    "usa_arrival_inspected_admitted_detail",
+    "usa_arrival_inspected_paroled",
+    "usa_arrival_inspected_paroled_detail",
+    "usa_arrival_other",
+    "usa_arrival_other_detail",
+    "usa_arrival_state",
+    "usa_arrival_without",
+    "uscis_number",
+    "visa_issued_date",
+    "visa_number"
+   ],
+   "groups": [
+    {
+     "label": "4. Do you have an Alien Registration Number (A-Number)?",
+     "fields": [
+      {
+       "pdf": "a-number",
+       "box": "4. Do you have an Alien Registration Number (A-Number)? — A-Number (if any)"
+      },
+      {
+       "pdf": "a_number_no",
+       "box": "4. Do you have an Alien Registration Number (A-Number)? — Yes — No"
+      },
+      {
+       "pdf": "a_number_yes",
+       "box": "4. Do you have an Alien Registration Number (A-Number)? — Yes"
+      }
+     ]
+    },
+    {
+     "label": "（表上无单独题面）",
+     "fields": [
+      {
+       "pdf": "a-number-1",
+       "box": "a-number-1"
+      },
+      {
+       "pdf": "a-number-10",
+       "box": "a-number-10"
+      },
+      {
+       "pdf": "a-number-11",
+       "box": "a-number-11"
+      },
+      {
+       "pdf": "a-number-12",
+       "box": "a-number-12"
+      },
+      {
+       "pdf": "a-number-13",
+       "box": "a-number-13"
+      },
+      {
+       "pdf": "a-number-14",
+       "box": "a-number-14"
+      },
+      {
+       "pdf": "a-number-15",
+       "box": "a-number-15"
+      },
+      {
+       "pdf": "a-number-16",
+       "box": "a-number-16"
+      },
+      {
+       "pdf": "a-number-17",
+       "box": "a-number-17"
+      },
+      {
+       "pdf": "a-number-18",
+       "box": "a-number-18"
+      },
+      {
+       "pdf": "a-number-19",
+       "box": "a-number-19"
+      },
+      {
+       "pdf": "a-number-2",
+       "box": "a-number-2"
+      },
+      {
+       "pdf": "a-number-20",
+       "box": "a-number-20"
+      },
+      {
+       "pdf": "a-number-21",
+       "box": "a-number-21"
+      },
+      {
+       "pdf": "a-number-22",
+       "box": "a-number-22"
+      },
+      {
+       "pdf": "a-number-23",
+       "box": "a-number-23"
+      },
+      {
+       "pdf": "a-number-24",
+       "box": "a-number-24"
+      },
+      {
+       "pdf": "a-number-25",
+       "box": "a-number-25"
+      },
+      {
+       "pdf": "a-number-26",
+       "box": "a-number-26"
+      },
+      {
+       "pdf": "a-number-27",
+       "box": "a-number-27"
+      },
+      {
+       "pdf": "a-number-3",
+       "box": "a-number-3"
+      },
+      {
+       "pdf": "a-number-4",
+       "box": "a-number-4"
+      },
+      {
+       "pdf": "a-number-5",
+       "box": "a-number-5"
+      },
+      {
+       "pdf": "a-number-6",
+       "box": "a-number-6"
+      },
+      {
+       "pdf": "a-number-7",
+       "box": "a-number-7"
+      },
+      {
+       "pdf": "a-number-8",
+       "box": "a-number-8"
+      },
+      {
+       "pdf": "a-number-9",
+       "box": "a-number-9"
+      },
+      {
+       "pdf": "current_flr",
+       "box": "current_flr"
+      },
+      {
+       "pdf": "outside_prior_number",
+       "box": "outside_prior_number"
+      },
+      {
+       "pdf": "outside_prior_zip",
+       "box": "outside_prior_zip"
+      }
+     ]
+    },
+    {
+     "label": "16. Have you ever been issued an “alien crewman” visa?",
+     "fields": [
+      {
+       "pdf": "alien_crewman_no",
+       "box": "16. Have you ever been issued an “alien crewman” visa? — Yes — No"
+      },
+      {
+       "pdf": "alien_crewman_yes",
+       "box": "16. Have you ever been issued an “alien crewman” visa? — Yes"
+      }
+     ]
+    },
+    {
+     "label": "7. Place of Birth",
+     "fields": [
+      {
+       "pdf": "city_of_birth",
+       "box": "7. Place of Birth — City or Town of Birth"
+      },
+      {
+       "pdf": "country_of_birth",
+       "box": "7. Place of Birth — Country of Birth"
+      }
+     ]
+    },
+    {
+     "label": "19. Social Security Card",
+     "fields": [
+      {
+       "pdf": "consent_disclosure_no",
+       "box": "19. Social Security Card — Consent for Disclosure: I authorize disclosure of information from this application to the SSA as required for the purpose of assigning me an SSN and issuing me a Social Security Card. — No"
+      },
+      {
+       "pdf": "consent_disclosure_yes",
+       "box": "19. Social Security Card — Consent for Disclosure: I authorize disclosure of information from this application to the SSA as required for the purpose of assigning me an SSN and issuing me a Social Security Card. — Yes"
+      },
+      {
+       "pdf": "ssn_issued_no",
+       "box": "19. Social Security Card — Has the Social Security Administration (SSA) ever officially issued a Social Security card to you? — No"
+      },
+      {
+       "pdf": "ssn_issued_yes",
+       "box": "19. Social Security Card — Has the Social Security Administration (SSA) ever officially issued a Social Security card to you? — Yes"
+      },
+      {
+       "pdf": "ssn_new_no",
+       "box": "19. Social Security Card — Do you want the SSA to issue you a Social Security card? — No"
+      },
+      {
+       "pdf": "ssn_new_yes",
+       "box": "19. Social Security Card — Do you want the SSA to issue you a Social Security card? — Yes"
+      },
+      {
+       "pdf": "ssn_number",
+       "box": "19. Social Security Card — If you answered “Yes,” provide your U.S. Social Security Number (SSN)."
+      }
+     ]
+    },
+    {
+     "label": "8. Country of Citizenship or Nationality",
+     "fields": [
+      {
+       "pdf": "country_of_citizenship",
+       "box": "8. Country of Citizenship or Nationality"
+      }
+     ]
+    },
+    {
+     "label": "15. Expiration Date of Current Immigration Status (mm/dd/yyyy) or “D/S”",
+     "fields": [
+      {
+       "pdf": "current_immigration_expiration_date",
+       "box": "15. Expiration Date of Current Immigration Status (mm/dd/yyyy) or “D/S”"
+      }
+     ]
+    },
+    {
+     "label": "14. What is your current immigration status (if it has changed since your last arrival)?",
+     "fields": [
+      {
+       "pdf": "current_immigration_status",
+       "box": "14. What is your current immigration status (if it has changed since your last arrival)?"
+      }
+     ]
+    },
+    {
+     "label": "3. Date of Birth (mm/dd/yyyy)",
+     "fields": [
+      {
+       "pdf": "dob",
+       "box": "Date of Birth"
+      }
+     ]
+    },
+    {
+     "label": "1. Your Current Legal Name (do not provide a nickname)",
+     "fields": [
+      {
+       "pdf": "first_name",
+       "box": "Given Name (First Name)"
+      },
+      {
+       "pdf": "last_name",
+       "box": "1. Your Current Legal Name (do not provide a nickname) — Family Name (Last Name)"
+      },
+      {
+       "pdf": "middle_name",
+       "box": "Middle Name"
+      }
+     ]
+    },
+    {
+     "label": "12. If you were issued a Form I-94 Arrival/Departure Record, provide the information from your most recent Form I-94 below:",
+     "fields": [
+      {
+       "pdf": "i94-number",
+       "box": "12. If you were issued a Form I-94 Arrival/Departure Record, provide the information from your most recent Form I-94 below: — Form I-94 Arrival/Departure Record Number"
+      },
+      {
+       "pdf": "i94_expiration_date",
+       "box": "12. If you were issued a Form I-94 Arrival/Departure Record, provide the information from your most recent Form I-94 below: — Expiration Date of Authorized Stay (mm/dd/yyyy) or type “D/S”"
+      },
+      {
+       "pdf": "i94_firstname",
+       "box": "12. If you were issued a Form I-94 Arrival/Departure Record, provide the information from your most recent Form I-94 below: — Given Name (First Name)"
+      },
+      {
+       "pdf": "i94_lastname",
+       "box": "12. If you were issued a Form I-94 Arrival/Departure Record, provide the information from your most recent Form I-94 below: — Family Name (Last Name)"
+      },
+      {
+       "pdf": "i94_status",
+       "box": "12. If you were issued a Form I-94 Arrival/Departure Record, provide the information from your most recent Form I-94 below: — Immigration Status on Form I-94"
+      }
+     ]
+    },
+    {
+     "label": "17. Did you last arrive in the United States to join a vessel or aircraft as a crewman?",
+     "fields": [
+      {
+       "pdf": "join_crewman_no",
+       "box": "17. Did you last arrive in the United States to join a vessel or aircraft as a crewman? — Yes — No"
+      },
+      {
+       "pdf": "join_crewman_yes",
+       "box": "17. Did you last arrive in the United States to join a vessel or aircraft as a crewman? — Yes"
+      }
+     ]
+    },
+    {
+     "label": "13. Was your last arrival the first time you were physically present in the United States?",
+     "fields": [
+      {
+       "pdf": "last_arrival_first_no",
+       "box": "13. Was your last arrival the first time you were physically present in the United States? — Yes — No"
+      },
+      {
+       "pdf": "last_arrival_first_yes",
+       "box": "13. Was your last arrival the first time you were physically present in the United States? — Yes"
+      }
+     ]
+    },
+    {
+     "label": "1. Physical Address",
+     "fields": [
+      {
+       "pdf": "mailing_address_no",
+       "box": "1. Physical Address — Is this your current mailing address? — No"
+      },
+      {
+       "pdf": "mailing_address_yes",
+       "box": "1. Physical Address — Is this your current mailing address? — Yes"
+      },
+      {
+       "pdf": "physical_apt",
+       "box": "Apartment"
+      },
+      {
+       "pdf": "physical_city",
+       "box": "City or Town"
+      },
+      {
+       "pdf": "physical_incare_of_name",
+       "box": "In Care Of Name"
+      },
+      {
+       "pdf": "physical_number",
+       "box": "Number"
+      },
+      {
+       "pdf": "physical_reside_date",
+       "box": "Date You First Resided at This Address"
+      },
+      {
+       "pdf": "physical_state",
+       "box": "State"
+      },
+      {
+       "pdf": "physical_ste",
+       "box": "Suite"
+      },
+      {
+       "pdf": "physical_street",
+       "box": "Street Number and Name"
+      },
+      {
+       "pdf": "physical_zip",
+       "box": "ZIP Code"
+      }
+     ]
+    },
+    {
+     "label": "2. Current Mailing Address (Safe or Alternate Mailing Address, if applicable)",
+     "fields": [
+      {
+       "pdf": "mailing_apt",
+       "box": "2. Current Mailing Address (Safe or Alternate Mailing Address, if applicable) — Apt. / Ste. / Flr. — Apt."
+      },
+      {
+       "pdf": "mailing_city",
+       "box": "2. Current Mailing Address (Safe or Alternate Mailing Address, if applicable) — City or Town"
+      },
+      {
+       "pdf": "mailing_flr",
+       "box": "2. Current Mailing Address (Safe or Alternate Mailing Address, if applicable) — Apt. / Ste. / Flr. — Flr."
+      },
+      {
+       "pdf": "mailing_incare_of_name",
+       "box": "2. Current Mailing Address (Safe or Alternate Mailing Address, if applicable) — In Care Of Name (if any)"
+      },
+      {
+       "pdf": "mailing_number",
+       "box": "2. Current Mailing Address (Safe or Alternate Mailing Address, if applicable) — Number"
+      },
+      {
+       "pdf": "mailing_state",
+       "box": "2. Current Mailing Address (Safe or Alternate Mailing Address, if applicable) — State"
+      },
+      {
+       "pdf": "mailing_ste",
+       "box": "2. Current Mailing Address (Safe or Alternate Mailing Address, if applicable) — Apt. / Ste. / Flr. — Ste."
+      },
+      {
+       "pdf": "mailing_street",
+       "box": "2. Current Mailing Address (Safe or Alternate Mailing Address, if applicable) — Street Number and Name"
+      },
+      {
+       "pdf": "mailing_zip",
+       "box": "2. Current Mailing Address (Safe or Alternate Mailing Address, if applicable) — ZIP Code"
+      }
+     ]
+    },
+    {
+     "label": "5. Have you ever used, or been assigned, any other A-Number?",
+     "fields": [
+      {
+       "pdf": "other_a_number_no",
+       "box": "5. Have you ever used, or been assigned, any other A-Number? — Yes — No"
+      },
+      {
+       "pdf": "other_a_number_yes",
+       "box": "5. Have you ever used, or been assigned, any other A-Number? — Yes"
+      }
+     ]
+    },
+    {
+     "label": "If you answered \"Yes,\" provide the A-Numbers.",
+     "fields": [
+      {
+       "pdf": "other_anumber_1",
+       "box": "If you answered \"Yes,\" provide the A-Numbers."
+      },
+      {
+       "pdf": "other_anumber_2",
+       "box": "If you answered \"Yes,\" provide the A-Numbers."
+      }
+     ]
+    },
+    {
+     "label": "If you answered \"Yes,\" provide all other dates of birth (mm/dd/yyyy).",
+     "fields": [
+      {
+       "pdf": "other_dob_1",
+       "box": "If you answered \"Yes,\" provide all other dates of birth (mm/dd/yyyy)."
+      },
+      {
+       "pdf": "other_dob_2",
+       "box": "If you answered \"Yes,\" provide all other dates of birth (mm/dd/yyyy)."
+      }
+     ]
+    },
+    {
+     "label": "Have you ever used any other date of birth?",
+     "fields": [
+      {
+       "pdf": "other_dob_no",
+       "box": "Have you ever used any other date of birth? — Yes — No"
+      },
+      {
+       "pdf": "other_dob_yes",
+       "box": "Have you ever used any other date of birth? — Yes"
+      }
+     ]
+    },
+    {
+     "label": "2. Other Names You Have Used Since Birth",
+     "fields": [
+      {
+       "pdf": "othername_firstname_1",
+       "box": "Other Name – Given Name (Row 1)"
+      },
+      {
+       "pdf": "othername_firstname_2",
+       "box": "Other Name – Given Name (Row 2)"
+      },
+      {
+       "pdf": "othername_lastname_1",
+       "box": "Other Name – Family Name (Row 1)"
+      },
+      {
+       "pdf": "othername_lastname_2",
+       "box": "Other Name – Family Name (Row 2)"
+      },
+      {
+       "pdf": "othername_middlename_1",
+       "box": "Other Name – Middle Name (Row 1)"
+      },
+      {
+       "pdf": "othername_middlename_2",
+       "box": "Other Name – Middle Name (Row 2)"
+      }
+     ]
+    },
+    {
+     "label": "10. Recent Immigration History",
+     "fields": [
+      {
+       "pdf": "passport_expiration_date",
+       "box": "10. Recent Immigration History — Expiration Date of this Passport or Travel Document (mm/dd/yyyy)"
+      },
+      {
+       "pdf": "passport_issued_country",
+       "box": "10. Recent Immigration History — Country that Issued this Passport or Travel Document"
+      },
+      {
+       "pdf": "passport_number",
+       "box": "10. Recent Immigration History — Passport or Travel Document Number Used at Last Arrival"
+      },
+      {
+       "pdf": "visa_issued_date",
+       "box": "10. Recent Immigration History — Date Nonimmigrant Visa Was Issued (mm/dd/yyyy)"
+      },
+      {
+       "pdf": "visa_number",
+       "box": "10. Recent Immigration History — Nonimmigrant Visa Number Used During Most Recent Arrival (if any)"
+      }
+     ]
+    },
+    {
+     "label": "Prior Address",
+     "fields": [
+      {
+       "pdf": "prior_apt",
+       "box": "Prior Address — Apt. / Ste. / Flr. — Apt."
+      },
+      {
+       "pdf": "prior_city",
+       "box": "Prior Address — City or Town"
+      },
+      {
+       "pdf": "prior_country",
+       "box": "Prior Address — Country"
+      },
+      {
+       "pdf": "prior_flr",
+       "box": "Prior Address — Apt. / Ste. / Flr. — Flr."
+      },
+      {
+       "pdf": "prior_incare_of_name",
+       "box": "Prior Address — In Care Of Name (if any)"
+      },
+      {
+       "pdf": "prior_number",
+       "box": "Prior Address — Number"
+      },
+      {
+       "pdf": "prior_postal",
+       "box": "Prior Address — Postal Code"
+      },
+      {
+       "pdf": "prior_province",
+       "box": "Prior Address — Province"
+      },
+      {
+       "pdf": "prior_reside_date_from",
+       "box": "Prior Address — Dates of Residence: From"
+      },
+      {
+       "pdf": "prior_reside_date_to",
+       "box": "Prior Address — Dates of Residence: To"
+      },
+      {
+       "pdf": "prior_state",
+       "box": "Prior Address — State"
+      },
+      {
+       "pdf": "prior_ste",
+       "box": "Prior Address — Apt. / Ste. / Flr. — Ste."
+      },
+      {
+       "pdf": "prior_street",
+       "box": "Prior Address — Street Number and Name"
+      },
+      {
+       "pdf": "prior_zip",
+       "box": "Prior Address — ZIP Code"
+      }
+     ]
+    },
+    {
+     "label": "（表上未印题面）",
+     "fields": [
+      {
+       "pdf": "recent_apt",
+       "box": "recent_apt"
+      },
+      {
+       "pdf": "recent_flr",
+       "box": "recent_flr"
+      },
+      {
+       "pdf": "recent_number",
+       "box": "recent_number"
+      },
+      {
+       "pdf": "recent_postal",
+       "box": "recent_postal"
+      },
+      {
+       "pdf": "recent_ste",
+       "box": "recent_ste"
+      }
+     ]
+    },
+    {
+     "label": "Most Recent Address Outside the United States (optional)",
+     "fields": [
+      {
+       "pdf": "recent_city",
+       "box": "Most Recent Address Outside the United States (optional) — City or Town"
+      },
+      {
+       "pdf": "recent_country",
+       "box": "Most Recent Address Outside the United States (optional) — Country"
+      },
+      {
+       "pdf": "recent_province",
+       "box": "Most Recent Address Outside the United States (optional) — Province"
+      },
+      {
+       "pdf": "recent_reside_date_from",
+       "box": "Most Recent Address Outside the United States (optional) — Dates of Residence: From"
+      },
+      {
+       "pdf": "recent_reside_date_to",
+       "box": "Most Recent Address Outside the United States (optional) — Dates of Residence: To"
+      },
+      {
+       "pdf": "recent_state",
+       "box": "Most Recent Address Outside the United States (optional) — State"
+      },
+      {
+       "pdf": "recent_street",
+       "box": "Most Recent Address Outside the United States (optional) — Street Number and Name"
+      },
+      {
+       "pdf": "recent_zip",
+       "box": "Most Recent Address Outside the United States (optional) — ZIP Code"
+      }
+     ]
+    },
+    {
+     "label": "Have you resided at your current address for at least 5 years? — No",
+     "fields": [
+      {
+       "pdf": "residing_address_no",
+       "box": "Have you resided at your current address for at least 5 years? — No"
+      }
+     ]
+    },
+    {
+     "label": "Have you resided at your current address for at least 5 years? — Yes",
+     "fields": [
+      {
+       "pdf": "residing_address_yes",
+       "box": "Have you resided at your current address for at least 5 years? — Yes"
+      }
+     ]
+    },
+    {
+     "label": "6. Sex",
+     "fields": [
+      {
+       "pdf": "sex_female",
+       "box": "6. Sex — Male — Female"
+      },
+      {
+       "pdf": "sex_male",
+       "box": "6. Sex — Male"
+      }
+     ]
+    },
+    {
+     "label": "Place and Date of Last Arrival into the United States",
+     "fields": [
+      {
+       "pdf": "usa_arrival_city",
+       "box": "Place and Date of Last Arrival into the United States — City or Town"
+      },
+      {
+       "pdf": "usa_arrival_date",
+       "box": "Date of Last Arrival (mm/dd/yyyy)"
+      },
+      {
+       "pdf": "usa_arrival_state",
+       "box": "Place and Date of Last Arrival into the United States — State"
+      }
+     ]
+    },
+    {
+     "label": "11. When I last arrived in the United States:",
+     "fields": [
+      {
+       "pdf": "usa_arrival_inspected_admitted",
+       "box": "11. When I last arrived in the United States: — I was inspected at a Port of Entry and admitted as (for example, exchange visitor, visitor, temporary worker, student):"
+      },
+      {
+       "pdf": "usa_arrival_inspected_admitted_detail",
+       "box": "11. When I last arrived in the United States: — I was inspected at a Port of Entry and admitted as (for example, exchange visitor, visitor, temporary worker, student):"
+      },
+      {
+       "pdf": "usa_arrival_inspected_paroled",
+       "box": "11. When I last arrived in the United States: — I was inspected at a Port of Entry and admitted as (for example, exchange visitor, visitor, temporary worker, student): — I was inspected at a Port of Entry and paroled as (for example, humanitarian parole, Cuban parole):"
+      },
+      {
+       "pdf": "usa_arrival_inspected_paroled_detail",
+       "box": "11. When I last arrived in the United States: — I was inspected at a Port of Entry and paroled as (for example, humanitarian parole, Cuban parole):"
+      },
+      {
+       "pdf": "usa_arrival_other",
+       "box": "11. When I last arrived in the United States: — I came into the United States without admission or parole. — Other:"
+      },
+      {
+       "pdf": "usa_arrival_other_detail",
+       "box": "11. When I last arrived in the United States: — Other:"
+      },
+      {
+       "pdf": "usa_arrival_without",
+       "box": "11. When I last arrived in the United States: — I was inspected at a Port of Entry and paroled as (for example, humanitarian parole, Cuban parole): — I came into the United States without admission or parole."
+      }
+     ]
+    },
+    {
+     "label": "9. USCIS Online Account Number (if any)",
+     "fields": [
+      {
+       "pdf": "uscis_number",
+       "box": "9. USCIS Online Account Number (if any)"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "application-type",
+   "no": 2,
+   "title": "Part 2 · 申请类别",
+   "count": 5,
+   "cats": [
+    "姓名",
+    "A-Number",
+    "护照/证件号"
+   ],
+   "fields": [
+    "eoir_number",
+    "principal_a_number",
+    "principal_firstname",
+    "principal_lastname",
+    "principal_middlename"
+   ],
+   "groups": [
+    {
+     "label": "Part 2 — Application Type or Filing Category",
+     "fields": [
+      {
+       "pdf": "eoir_number",
+       "box": "Receipt Number of Underlying Petition (if any)"
+      }
+     ]
+    },
+    {
+     "label": "Principal Applicant’s Information",
+     "fields": [
+      {
+       "pdf": "principal_a_number",
+       "box": "Principal Applicant’s A-Number (if any)"
+      },
+      {
+       "pdf": "principal_firstname",
+       "box": "Principal Applicant’s Information — Given Name (First Name)"
+      },
+      {
+       "pdf": "principal_lastname",
+       "box": "Principal Applicant’s Information — Family Name (Last Name)"
+      },
+      {
+       "pdf": "principal_middlename",
+       "box": "Principal Applicant’s Information — Middle Name (if applicable)"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "additional-info",
+   "no": 4,
+   "title": "Part 4 · 附加信息（移民签证 / 工作与教育经历）",
+   "count": 22,
+   "cats": [
+    "地址"
+   ],
+   "fields": [
+    "employer_apt",
+    "employer_city",
+    "employer_country",
+    "employer_flr",
+    "employer_number",
+    "employer_postal",
+    "employer_province",
+    "employer_state",
+    "employer_ste",
+    "employer_street",
+    "employer_zip",
+    "outside_employer_apt",
+    "outside_employer_city",
+    "outside_employer_country",
+    "outside_employer_flr",
+    "outside_employer_postal",
+    "outside_employer_province",
+    "outside_employer_state",
+    "outside_employer_ste",
+    "outside_employer_street",
+    "permanent_resident_city",
+    "permanent_resident_country"
+   ],
+   "groups": [
+    {
+     "label": "Address of Employer, Company, or School",
+     "fields": [
+      {
+       "pdf": "employer_apt",
+       "box": "Address of Employer, Company, or School — Apt / Ste / Flr"
+      },
+      {
+       "pdf": "employer_city",
+       "box": "Address of Employer, Company, or School — City or Town"
+      },
+      {
+       "pdf": "employer_country",
+       "box": "Address of Employer, Company, or School — Country"
+      },
+      {
+       "pdf": "employer_flr",
+       "box": "Address of Employer, Company, or School — Apt / Ste / Flr"
+      },
+      {
+       "pdf": "employer_number",
+       "box": "Address of Employer, Company, or School — Number"
+      },
+      {
+       "pdf": "employer_postal",
+       "box": "Address of Employer, Company, or School — Postal Code"
+      },
+      {
+       "pdf": "employer_province",
+       "box": "Address of Employer, Company, or School — Province"
+      },
+      {
+       "pdf": "employer_state",
+       "box": "Address of Employer, Company, or School — State"
+      },
+      {
+       "pdf": "employer_ste",
+       "box": "Address of Employer, Company, or School — Apt / Ste / Flr"
+      },
+      {
+       "pdf": "employer_street",
+       "box": "Address of Employer, Company, or School — Street Number and Name"
+      },
+      {
+       "pdf": "employer_zip",
+       "box": "Address of Employer, Company, or School — ZIP Code"
+      },
+      {
+       "pdf": "outside_employer_apt",
+       "box": "Address of Employer, Company, or School — Apt / Ste / Flr"
+      },
+      {
+       "pdf": "outside_employer_city",
+       "box": "Address of Employer, Company, or School — City or Town"
+      },
+      {
+       "pdf": "outside_employer_country",
+       "box": "Address of Employer, Company, or School — Country"
+      },
+      {
+       "pdf": "outside_employer_flr",
+       "box": "Address of Employer, Company, or School — Apt / Ste / Flr"
+      },
+      {
+       "pdf": "outside_employer_postal",
+       "box": "Address of Employer, Company, or School — Postal Code"
+      },
+      {
+       "pdf": "outside_employer_province",
+       "box": "Address of Employer, Company, or School — Province"
+      },
+      {
+       "pdf": "outside_employer_state",
+       "box": "Address of Employer, Company, or School — State"
+      },
+      {
+       "pdf": "outside_employer_ste",
+       "box": "Address of Employer, Company, or School — Apt / Ste / Flr"
+      },
+      {
+       "pdf": "outside_employer_street",
+       "box": "Address of Employer, Company, or School — Street Number and Name"
+      }
+     ]
+    },
+    {
+     "label": "2. City or Town",
+     "fields": [
+      {
+       "pdf": "permanent_resident_city",
+       "box": "2. City or Town"
+      }
+     ]
+    },
+    {
+     "label": "Immigrant Visa History",
+     "fields": [
+      {
+       "pdf": "permanent_resident_country",
+       "box": "Immigrant Visa History — Country"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "parent-info",
+   "no": 5,
+   "title": "Part 5 · 父母信息（Information About Your Parents）",
+   "count": 16,
+   "cats": [
+    "姓名"
+   ],
+   "fields": [
+    "parentone_birth_firstname",
+    "parentone_birth_lastname",
+    "parentone_birth_middlename",
+    "parentone_country",
+    "parentone_dob",
+    "parentone_firstname",
+    "parentone_lastname",
+    "parentone_middlename",
+    "parenttwo_birth_firstname",
+    "parenttwo_birth_lastname",
+    "parenttwo_birth_middlename",
+    "parenttwo_country",
+    "parenttwo_dob",
+    "parenttwo_firstname",
+    "parenttwo_lastname",
+    "parenttwo_middlename"
+   ],
+   "groups": [
+    {
+     "label": "2. Parent 1's Name at Birth (if different than above)",
+     "fields": [
+      {
+       "pdf": "parentone_birth_firstname",
+       "box": "2. Parent 1's Name at Birth (if different than above) — Given Name (First Name)"
+      },
+      {
+       "pdf": "parentone_birth_lastname",
+       "box": "2. Parent 1's Name at Birth (if different than above) — Family Name (Last Name)"
+      },
+      {
+       "pdf": "parentone_birth_middlename",
+       "box": "2. Parent 1's Name at Birth (if different than above) — Middle Name (if applicable)"
+      }
+     ]
+    },
+    {
+     "label": "4. Country of Birth",
+     "fields": [
+      {
+       "pdf": "parentone_country",
+       "box": "4. Country of Birth"
+      }
+     ]
+    },
+    {
+     "label": "3. Date of Birth",
+     "fields": [
+      {
+       "pdf": "parentone_dob",
+       "box": "3. Date of Birth"
+      }
+     ]
+    },
+    {
+     "label": "1. Parent 1's Legal Name",
+     "fields": [
+      {
+       "pdf": "parentone_firstname",
+       "box": "1. Parent 1's Legal Name — Given Name (First Name)"
+      },
+      {
+       "pdf": "parentone_lastname",
+       "box": "1. Parent 1's Legal Name — Family Name (Last Name)"
+      },
+      {
+       "pdf": "parentone_middlename",
+       "box": "1. Parent 1's Legal Name — Middle Name (if applicable)"
+      }
+     ]
+    },
+    {
+     "label": "6. Parent 2's Name at Birth (if different than above)",
+     "fields": [
+      {
+       "pdf": "parenttwo_birth_firstname",
+       "box": "6. Parent 2's Name at Birth (if different than above) — Given Name (First Name)"
+      },
+      {
+       "pdf": "parenttwo_birth_lastname",
+       "box": "6. Parent 2's Name at Birth (if different than above) — Family Name (Last Name)"
+      },
+      {
+       "pdf": "parenttwo_birth_middlename",
+       "box": "6. Parent 2's Name at Birth (if different than above) — Middle Name (if applicable)"
+      }
+     ]
+    },
+    {
+     "label": "8. Country of Birth",
+     "fields": [
+      {
+       "pdf": "parenttwo_country",
+       "box": "8. Country of Birth"
+      }
+     ]
+    },
+    {
+     "label": "7. Date of Birth",
+     "fields": [
+      {
+       "pdf": "parenttwo_dob",
+       "box": "7. Date of Birth"
+      }
+     ]
+    },
+    {
+     "label": "5. Parent 2's Legal Name",
+     "fields": [
+      {
+       "pdf": "parenttwo_firstname",
+       "box": "5. Parent 2's Legal Name — Given Name (First Name)"
+      },
+      {
+       "pdf": "parenttwo_lastname",
+       "box": "5. Parent 2's Legal Name — Family Name (Last Name)"
+      },
+      {
+       "pdf": "parenttwo_middlename",
+       "box": "5. Parent 2's Legal Name — Middle Name (if applicable)"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "marital-history",
+   "no": 6,
+   "title": "Part 6 · 婚姻史（Information About Your Marital History）",
+   "count": 18,
+   "cats": [
+    "姓名",
+    "A-Number",
+    "地址"
+   ],
+   "fields": [
+    "currentspouse_anumber",
+    "currentspouse_apt",
+    "currentspouse_city",
+    "currentspouse_country",
+    "currentspouse_firstname",
+    "currentspouse_flr",
+    "currentspouse_lastname",
+    "currentspouse_middlename",
+    "currentspouse_number",
+    "currentspouse_postal",
+    "currentspouse_province",
+    "currentspouse_state",
+    "currentspouse_ste",
+    "currentspouse_street",
+    "currentspouse_zip",
+    "priorspouse_firstname",
+    "priorspouse_lastname",
+    "priorspouse_middlename"
+   ],
+   "groups": [
+    {
+     "label": "5. Current Spouse’s A-Number (if any)",
+     "fields": [
+      {
+       "pdf": "currentspouse_anumber",
+       "box": "5. Current Spouse’s A-Number (if any)"
+      }
+     ]
+    },
+    {
+     "label": "8. Current Spouse’s Current Physical Address",
+     "fields": [
+      {
+       "pdf": "currentspouse_apt",
+       "box": "8. Current Spouse’s Current Physical Address — Apt / Ste / Flr"
+      },
+      {
+       "pdf": "currentspouse_city",
+       "box": "8. Current Spouse’s Current Physical Address — City or Town"
+      },
+      {
+       "pdf": "currentspouse_country",
+       "box": "8. Current Spouse’s Current Physical Address — Country"
+      },
+      {
+       "pdf": "currentspouse_flr",
+       "box": "8. Current Spouse’s Current Physical Address — Apt / Ste / Flr"
+      },
+      {
+       "pdf": "currentspouse_number",
+       "box": "8. Current Spouse’s Current Physical Address — Number"
+      },
+      {
+       "pdf": "currentspouse_postal",
+       "box": "8. Current Spouse’s Current Physical Address — Postal Code"
+      },
+      {
+       "pdf": "currentspouse_province",
+       "box": "8. Current Spouse’s Current Physical Address — Province"
+      },
+      {
+       "pdf": "currentspouse_state",
+       "box": "8. Current Spouse’s Current Physical Address — State"
+      },
+      {
+       "pdf": "currentspouse_ste",
+       "box": "8. Current Spouse’s Current Physical Address — Apt / Ste / Flr"
+      },
+      {
+       "pdf": "currentspouse_street",
+       "box": "8. Current Spouse’s Current Physical Address — Street Number and Name"
+      },
+      {
+       "pdf": "currentspouse_zip",
+       "box": "8. Current Spouse’s Current Physical Address — ZIP Code"
+      }
+     ]
+    },
+    {
+     "label": "4. Current Spouse’s Legal Name",
+     "fields": [
+      {
+       "pdf": "currentspouse_firstname",
+       "box": "4. Current Spouse’s Legal Name — Given Name (First Name)"
+      },
+      {
+       "pdf": "currentspouse_lastname",
+       "box": "4. Current Spouse’s Legal Name — Family Name (Last Name)"
+      },
+      {
+       "pdf": "currentspouse_middlename",
+       "box": "4. Current Spouse’s Legal Name — Middle Name (if applicable)"
+      }
+     ]
+    },
+    {
+     "label": "11. Prior Spouse’s Legal Name",
+     "fields": [
+      {
+       "pdf": "priorspouse_firstname",
+       "box": "11. Prior Spouse’s Legal Name — Given Name (First Name)"
+      },
+      {
+       "pdf": "priorspouse_lastname",
+       "box": "11. Prior Spouse’s Legal Name — Family Name (Last Name)"
+      },
+      {
+       "pdf": "priorspouse_middlename",
+       "box": "11. Prior Spouse’s Legal Name — Middle Name (if applicable)"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "children-info",
+   "no": 7,
+   "title": "Part 7 · 子女信息（Information About Your Children）",
+   "count": 12,
+   "cats": [
+    "姓名",
+    "A-Number",
+    "子女个人信息"
+   ],
+   "fields": [
+    "childone_a_number",
+    "childone_country",
+    "childone_dob",
+    "childone_firstname",
+    "childone_lastname",
+    "childone_middlename",
+    "childtwo_a_number",
+    "childtwo_country",
+    "childtwo_dob",
+    "childtwo_firstname",
+    "childtwo_lastname",
+    "childtwo_middlename"
+   ],
+   "groups": [
+    {
+     "label": "Current Legal Name",
+     "fields": [
+      {
+       "pdf": "childone_a_number",
+       "box": "Current Legal Name — A-Number (if any)"
+      },
+      {
+       "pdf": "childone_country",
+       "box": "Current Legal Name — Country of Birth"
+      },
+      {
+       "pdf": "childone_dob",
+       "box": "Current Legal Name — Date of Birth"
+      },
+      {
+       "pdf": "childone_firstname",
+       "box": "Current Legal Name — Given Name (First Name)"
+      },
+      {
+       "pdf": "childone_lastname",
+       "box": "Current Legal Name — Family Name (Last Name)"
+      },
+      {
+       "pdf": "childone_middlename",
+       "box": "Current Legal Name — Middle Name (if applicable)"
+      },
+      {
+       "pdf": "childtwo_a_number",
+       "box": "Current Legal Name — A-Number (if any)"
+      },
+      {
+       "pdf": "childtwo_country",
+       "box": "Current Legal Name — Country of Birth"
+      },
+      {
+       "pdf": "childtwo_dob",
+       "box": "Current Legal Name — Date of Birth"
+      },
+      {
+       "pdf": "childtwo_firstname",
+       "box": "Current Legal Name — Given Name (First Name)"
+      },
+      {
+       "pdf": "childtwo_lastname",
+       "box": "Current Legal Name — Family Name (Last Name)"
+      },
+      {
+       "pdf": "childtwo_middlename",
+       "box": "Current Legal Name — Middle Name (if applicable)"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "biographic-info",
+   "no": 8,
+   "title": "Part 8 · 生物信息（族裔 / 身高 / 眼睛头发颜色）",
+   "count": 3,
+   "cats": [
+    "体重"
+   ],
+   "fields": [
+    "weight_1",
+    "weight_2",
+    "weight_3"
+   ],
+   "groups": [
+    {
+     "label": "Weight（体重，3 个小格）",
+     "fields": [
+      {
+       "pdf": "weight_1",
+       "box": "weight_1"
+      },
+      {
+       "pdf": "weight_2",
+       "box": "weight_2"
+      },
+      {
+       "pdf": "weight_3",
+       "box": "weight_3"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "9d",
+   "no": 9,
+   "title": "Part 9 · 公共负担（Public Charge，Items 56–64）",
+   "count": 1,
+   "cats": [
+    "教育程度"
+   ],
+   "fields": [
+    "school_college_credit"
+   ],
+   "groups": [
+    {
+     "label": "1 or more years of college credit, no degree（教育程度）",
+     "fields": [
+      {
+       "pdf": "school_college_credit",
+       "box": "school_college_credit"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "applicant-info",
+   "no": 10,
+   "title": "Part 10 · 申请人联系方式与签名（Applicant’s Contact Information, Certification, and Signature）",
+   "count": 5,
+   "cats": [
+    "电话",
+    "邮箱",
+    "签名"
+   ],
+   "fields": [
+    "applicant_email",
+    "applicant_mobile",
+    "applicant_sign",
+    "applicant_sign_date",
+    "applicant_telephone"
+   ],
+   "groups": [
+    {
+     "label": "3. Applicant’s Email Address (if any)",
+     "fields": [
+      {
+       "pdf": "applicant_email",
+       "box": "3. Applicant’s Email Address (if any)"
+      }
+     ]
+    },
+    {
+     "label": "2. Applicant’s Mobile Telephone Number (if any)",
+     "fields": [
+      {
+       "pdf": "applicant_mobile",
+       "box": "2. Applicant’s Mobile Telephone Number (if any)"
+      }
+     ]
+    },
+    {
+     "label": "申请人签名（Applicant’s Signature / Date of Signature）",
+     "fields": [
+      {
+       "pdf": "applicant_sign",
+       "box": "applicant_sign"
+      },
+      {
+       "pdf": "applicant_sign_date",
+       "box": "applicant_sign_date"
+      }
+     ]
+    },
+    {
+     "label": "1. Applicant’s Daytime Telephone Number",
+     "fields": [
+      {
+       "pdf": "applicant_telephone",
+       "box": "1. Applicant’s Daytime Telephone Number"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "interpreter-info",
+   "no": 11,
+   "title": "Part 11 · 口译员信息与签名（Interpreter’s Contact Information, Certification, and Signature）",
+   "count": 8,
+   "cats": [
+    "姓名",
+    "电话",
+    "邮箱",
+    "签名"
+   ],
+   "fields": [
+    "interpreter_businessname",
+    "interpreter_email",
+    "interpreter_firstname",
+    "interpreter_lastname",
+    "interpreter_mobile",
+    "interpreter_sign",
+    "interpreter_sign_date",
+    "interpreter_telephone"
+   ],
+   "groups": [
+    {
+     "label": "2. Interpreter’s Business or Organization Name",
+     "fields": [
+      {
+       "pdf": "interpreter_businessname",
+       "box": "2. Interpreter’s Business or Organization Name"
+      }
+     ]
+    },
+    {
+     "label": "5. Interpreter’s Email Address (if any)",
+     "fields": [
+      {
+       "pdf": "interpreter_email",
+       "box": "5. Interpreter’s Email Address (if any)"
+      }
+     ]
+    },
+    {
+     "label": "Interpreter’s Full Name",
+     "fields": [
+      {
+       "pdf": "interpreter_firstname",
+       "box": "Interpreter’s Full Name — Interpreter’s Given Name (First Name)"
+      }
+     ]
+    },
+    {
+     "label": "1. Interpreter’s Family Name (Last Name)",
+     "fields": [
+      {
+       "pdf": "interpreter_lastname",
+       "box": "1. Interpreter’s Family Name (Last Name)"
+      }
+     ]
+    },
+    {
+     "label": "4. Interpreter’s Mobile Telephone Number (if any)",
+     "fields": [
+      {
+       "pdf": "interpreter_mobile",
+       "box": "4. Interpreter’s Mobile Telephone Number (if any)"
+      }
+     ]
+    },
+    {
+     "label": "口译员签名（Interpreter’s Signature / Date of Signature）",
+     "fields": [
+      {
+       "pdf": "interpreter_sign",
+       "box": "interpreter_sign"
+      },
+      {
+       "pdf": "interpreter_sign_date",
+       "box": "interpreter_sign_date"
+      }
+     ]
+    },
+    {
+     "label": "3. Interpreter’s Daytime Telephone Number",
+     "fields": [
+      {
+       "pdf": "interpreter_telephone",
+       "box": "3. Interpreter’s Daytime Telephone Number"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "preparer-info",
+   "no": 12,
+   "title": "Part 12 · 代填人信息与签名（Preparer’s Contact Information, Certification, and Signature）",
+   "count": 8,
+   "cats": [
+    "姓名",
+    "电话",
+    "邮箱",
+    "签名"
+   ],
+   "fields": [
+    "preparer_businessname",
+    "preparer_email",
+    "preparer_firstname",
+    "preparer_lastname",
+    "preparer_mobile",
+    "preparer_sign",
+    "preparer_sign_date",
+    "preparer_telephone"
+   ],
+   "groups": [
+    {
+     "label": "2. Preparer’s Business or Organization Name",
+     "fields": [
+      {
+       "pdf": "preparer_businessname",
+       "box": "2. Preparer’s Business or Organization Name"
+      }
+     ]
+    },
+    {
+     "label": "5. Preparer’s Email Address (if any)",
+     "fields": [
+      {
+       "pdf": "preparer_email",
+       "box": "5. Preparer’s Email Address (if any)"
+      }
+     ]
+    },
+    {
+     "label": "Preparer’s Full Name",
+     "fields": [
+      {
+       "pdf": "preparer_firstname",
+       "box": "Preparer’s Full Name — Preparer’s Given Name (First Name)"
+      }
+     ]
+    },
+    {
+     "label": "1. Preparer’s Family Name (Last Name)",
+     "fields": [
+      {
+       "pdf": "preparer_lastname",
+       "box": "1. Preparer’s Family Name (Last Name)"
+      }
+     ]
+    },
+    {
+     "label": "4. Preparer’s Mobile Telephone Number (if any)",
+     "fields": [
+      {
+       "pdf": "preparer_mobile",
+       "box": "4. Preparer’s Mobile Telephone Number (if any)"
+      }
+     ]
+    },
+    {
+     "label": "代填人签名（Preparer’s Signature / Date of Signature）",
+     "fields": [
+      {
+       "pdf": "preparer_sign",
+       "box": "preparer_sign"
+      },
+      {
+       "pdf": "preparer_sign_date",
+       "box": "preparer_sign_date"
+      }
+     ]
+    },
+    {
+     "label": "3. Preparer’s Daytime Telephone Number",
+     "fields": [
+      {
+       "pdf": "preparer_telephone",
+       "box": "3. Preparer’s Daytime Telephone Number"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "additional-info-page",
+   "no": 14,
+   "title": "Part 14 · 附加信息续页（Additional Information）",
+   "count": 76,
+   "cats": [
+    "续页空白行"
+   ],
+   "fields": [
+    "additional_info_description_1",
+    "additional_info_description_10",
+    "additional_info_description_11",
+    "additional_info_description_12",
+    "additional_info_description_13",
+    "additional_info_description_14",
+    "additional_info_description_15",
+    "additional_info_description_16",
+    "additional_info_description_2",
+    "additional_info_description_3",
+    "additional_info_description_4",
+    "additional_info_description_5",
+    "additional_info_description_6",
+    "additional_info_description_7",
+    "additional_info_description_8",
+    "additional_info_description_9",
+    "additional_info_givenname_1",
+    "additional_info_givenname_2",
+    "additional_info_givenname_3",
+    "additional_info_givenname_4",
+    "additional_info_itno_1",
+    "additional_info_itno_10",
+    "additional_info_itno_11",
+    "additional_info_itno_12",
+    "additional_info_itno_13",
+    "additional_info_itno_14",
+    "additional_info_itno_15",
+    "additional_info_itno_16",
+    "additional_info_itno_2",
+    "additional_info_itno_3",
+    "additional_info_itno_4",
+    "additional_info_itno_5",
+    "additional_info_itno_6",
+    "additional_info_itno_7",
+    "additional_info_itno_8",
+    "additional_info_itno_9",
+    "additional_info_lastname_1",
+    "additional_info_lastname_2",
+    "additional_info_lastname_3",
+    "additional_info_lastname_4",
+    "additional_info_middlename_1",
+    "additional_info_middlename_2",
+    "additional_info_middlename_3",
+    "additional_info_middlename_4",
+    "additional_info_pgno_1",
+    "additional_info_pgno_10",
+    "additional_info_pgno_11",
+    "additional_info_pgno_12",
+    "additional_info_pgno_13",
+    "additional_info_pgno_14",
+    "additional_info_pgno_15",
+    "additional_info_pgno_16",
+    "additional_info_pgno_2",
+    "additional_info_pgno_3",
+    "additional_info_pgno_4",
+    "additional_info_pgno_5",
+    "additional_info_pgno_6",
+    "additional_info_pgno_7",
+    "additional_info_pgno_8",
+    "additional_info_pgno_9",
+    "additional_info_ptno_1",
+    "additional_info_ptno_10",
+    "additional_info_ptno_11",
+    "additional_info_ptno_12",
+    "additional_info_ptno_13",
+    "additional_info_ptno_14",
+    "additional_info_ptno_15",
+    "additional_info_ptno_16",
+    "additional_info_ptno_2",
+    "additional_info_ptno_3",
+    "additional_info_ptno_4",
+    "additional_info_ptno_5",
+    "additional_info_ptno_6",
+    "additional_info_ptno_7",
+    "additional_info_ptno_8",
+    "additional_info_ptno_9"
+   ],
+   "groups": [
+    {
+     "label": "续页空白行（Page / Part / Item / Description，写不下时才用）",
+     "fields": [
+      {
+       "pdf": "additional_info_description_1",
+       "box": "additional_info_description_1"
+      },
+      {
+       "pdf": "additional_info_description_10",
+       "box": "additional_info_description_10"
+      },
+      {
+       "pdf": "additional_info_description_11",
+       "box": "additional_info_description_11"
+      },
+      {
+       "pdf": "additional_info_description_12",
+       "box": "additional_info_description_12"
+      },
+      {
+       "pdf": "additional_info_description_13",
+       "box": "additional_info_description_13"
+      },
+      {
+       "pdf": "additional_info_description_14",
+       "box": "additional_info_description_14"
+      },
+      {
+       "pdf": "additional_info_description_15",
+       "box": "additional_info_description_15"
+      },
+      {
+       "pdf": "additional_info_description_16",
+       "box": "additional_info_description_16"
+      },
+      {
+       "pdf": "additional_info_description_2",
+       "box": "additional_info_description_2"
+      },
+      {
+       "pdf": "additional_info_description_3",
+       "box": "additional_info_description_3"
+      },
+      {
+       "pdf": "additional_info_description_4",
+       "box": "additional_info_description_4"
+      },
+      {
+       "pdf": "additional_info_description_5",
+       "box": "additional_info_description_5"
+      },
+      {
+       "pdf": "additional_info_description_6",
+       "box": "additional_info_description_6"
+      },
+      {
+       "pdf": "additional_info_description_7",
+       "box": "additional_info_description_7"
+      },
+      {
+       "pdf": "additional_info_description_8",
+       "box": "additional_info_description_8"
+      },
+      {
+       "pdf": "additional_info_description_9",
+       "box": "additional_info_description_9"
+      },
+      {
+       "pdf": "additional_info_givenname_1",
+       "box": "additional_info_givenname_1"
+      },
+      {
+       "pdf": "additional_info_givenname_2",
+       "box": "additional_info_givenname_2"
+      },
+      {
+       "pdf": "additional_info_givenname_3",
+       "box": "additional_info_givenname_3"
+      },
+      {
+       "pdf": "additional_info_givenname_4",
+       "box": "additional_info_givenname_4"
+      },
+      {
+       "pdf": "additional_info_itno_1",
+       "box": "additional_info_itno_1"
+      },
+      {
+       "pdf": "additional_info_itno_10",
+       "box": "additional_info_itno_10"
+      },
+      {
+       "pdf": "additional_info_itno_11",
+       "box": "additional_info_itno_11"
+      },
+      {
+       "pdf": "additional_info_itno_12",
+       "box": "additional_info_itno_12"
+      },
+      {
+       "pdf": "additional_info_itno_13",
+       "box": "additional_info_itno_13"
+      },
+      {
+       "pdf": "additional_info_itno_14",
+       "box": "additional_info_itno_14"
+      },
+      {
+       "pdf": "additional_info_itno_15",
+       "box": "additional_info_itno_15"
+      },
+      {
+       "pdf": "additional_info_itno_16",
+       "box": "additional_info_itno_16"
+      },
+      {
+       "pdf": "additional_info_itno_2",
+       "box": "additional_info_itno_2"
+      },
+      {
+       "pdf": "additional_info_itno_3",
+       "box": "additional_info_itno_3"
+      },
+      {
+       "pdf": "additional_info_itno_4",
+       "box": "additional_info_itno_4"
+      },
+      {
+       "pdf": "additional_info_itno_5",
+       "box": "additional_info_itno_5"
+      },
+      {
+       "pdf": "additional_info_itno_6",
+       "box": "additional_info_itno_6"
+      },
+      {
+       "pdf": "additional_info_itno_7",
+       "box": "additional_info_itno_7"
+      },
+      {
+       "pdf": "additional_info_itno_8",
+       "box": "additional_info_itno_8"
+      },
+      {
+       "pdf": "additional_info_itno_9",
+       "box": "additional_info_itno_9"
+      },
+      {
+       "pdf": "additional_info_lastname_1",
+       "box": "additional_info_lastname_1"
+      },
+      {
+       "pdf": "additional_info_lastname_2",
+       "box": "additional_info_lastname_2"
+      },
+      {
+       "pdf": "additional_info_lastname_3",
+       "box": "additional_info_lastname_3"
+      },
+      {
+       "pdf": "additional_info_lastname_4",
+       "box": "additional_info_lastname_4"
+      },
+      {
+       "pdf": "additional_info_middlename_1",
+       "box": "additional_info_middlename_1"
+      },
+      {
+       "pdf": "additional_info_middlename_2",
+       "box": "additional_info_middlename_2"
+      },
+      {
+       "pdf": "additional_info_middlename_3",
+       "box": "additional_info_middlename_3"
+      },
+      {
+       "pdf": "additional_info_middlename_4",
+       "box": "additional_info_middlename_4"
+      },
+      {
+       "pdf": "additional_info_pgno_1",
+       "box": "additional_info_pgno_1"
+      },
+      {
+       "pdf": "additional_info_pgno_10",
+       "box": "additional_info_pgno_10"
+      },
+      {
+       "pdf": "additional_info_pgno_11",
+       "box": "additional_info_pgno_11"
+      },
+      {
+       "pdf": "additional_info_pgno_12",
+       "box": "additional_info_pgno_12"
+      },
+      {
+       "pdf": "additional_info_pgno_13",
+       "box": "additional_info_pgno_13"
+      },
+      {
+       "pdf": "additional_info_pgno_14",
+       "box": "additional_info_pgno_14"
+      },
+      {
+       "pdf": "additional_info_pgno_15",
+       "box": "additional_info_pgno_15"
+      },
+      {
+       "pdf": "additional_info_pgno_16",
+       "box": "additional_info_pgno_16"
+      },
+      {
+       "pdf": "additional_info_pgno_2",
+       "box": "additional_info_pgno_2"
+      },
+      {
+       "pdf": "additional_info_pgno_3",
+       "box": "additional_info_pgno_3"
+      },
+      {
+       "pdf": "additional_info_pgno_4",
+       "box": "additional_info_pgno_4"
+      },
+      {
+       "pdf": "additional_info_pgno_5",
+       "box": "additional_info_pgno_5"
+      },
+      {
+       "pdf": "additional_info_pgno_6",
+       "box": "additional_info_pgno_6"
+      },
+      {
+       "pdf": "additional_info_pgno_7",
+       "box": "additional_info_pgno_7"
+      },
+      {
+       "pdf": "additional_info_pgno_8",
+       "box": "additional_info_pgno_8"
+      },
+      {
+       "pdf": "additional_info_pgno_9",
+       "box": "additional_info_pgno_9"
+      },
+      {
+       "pdf": "additional_info_ptno_1",
+       "box": "additional_info_ptno_1"
+      },
+      {
+       "pdf": "additional_info_ptno_10",
+       "box": "additional_info_ptno_10"
+      },
+      {
+       "pdf": "additional_info_ptno_11",
+       "box": "additional_info_ptno_11"
+      },
+      {
+       "pdf": "additional_info_ptno_12",
+       "box": "additional_info_ptno_12"
+      },
+      {
+       "pdf": "additional_info_ptno_13",
+       "box": "additional_info_ptno_13"
+      },
+      {
+       "pdf": "additional_info_ptno_14",
+       "box": "additional_info_ptno_14"
+      },
+      {
+       "pdf": "additional_info_ptno_15",
+       "box": "additional_info_ptno_15"
+      },
+      {
+       "pdf": "additional_info_ptno_16",
+       "box": "additional_info_ptno_16"
+      },
+      {
+       "pdf": "additional_info_ptno_2",
+       "box": "additional_info_ptno_2"
+      },
+      {
+       "pdf": "additional_info_ptno_3",
+       "box": "additional_info_ptno_3"
+      },
+      {
+       "pdf": "additional_info_ptno_4",
+       "box": "additional_info_ptno_4"
+      },
+      {
+       "pdf": "additional_info_ptno_5",
+       "box": "additional_info_ptno_5"
+      },
+      {
+       "pdf": "additional_info_ptno_6",
+       "box": "additional_info_ptno_6"
+      },
+      {
+       "pdf": "additional_info_ptno_7",
+       "box": "additional_info_ptno_7"
+      },
+      {
+       "pdf": "additional_info_ptno_8",
+       "box": "additional_info_ptno_8"
+      },
+      {
+       "pdf": "additional_info_ptno_9",
+       "box": "additional_info_ptno_9"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

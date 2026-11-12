@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<!-- data-theme 必须写在 <html> 上（v9 批 1 修 Y1）：
+     theme.css 的选择器是 html[data-theme="..."]，写在 body 上则
+     JS 执行前整页没有颜色（首帧透明 / 白闪）。body 上也留一份（无害，脚本方便读）。 -->
+<html lang="zh-CN" data-theme="shenqing">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>I-485 中文填表助手</title>
+<link rel="icon" href="assets/favicon.ico" sizes="any">
+<!-- 颜色唯一事实源（v9 批 1）：三套皮肤 = 三组变量，改一处三套同时生效。
+     必须在 style.css 之前加载：style.css 只读令牌，不写死颜色。 -->
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="style.css">
+<!-- 标题字体预加载：font-display: optional 下 100ms 内到不了就放弃本次替换，
+     所以必须让字体尽早开始下载（as=font + crossorigin 与 @font-face 请求同模式）。
+     v9 批 3d：file:// 下 origin=null，静态 preload 必被 CORS 拦（控制台 2 条 error），
+     故只在 http(s) 下动态插入同一条 link；本地双击零报错、字体走系统宋体栈。 -->
+<script>
+if (location.protocol === 'http:' || location.protocol === 'https:') { var l = document.createElement('link'); l.rel = 'preload'; l.as = 'font'; l.type = 'font/woff2'; l.crossOrigin = 'anonymous'; l.href = 'fonts/NotoSerifSC-SemiBold.subset.woff2'; document.head.appendChild(l); }
+</script>
+<!-- 标题字体可用性检测：file:// 下 Chrome 拦本地 woff2 时给 <html> 加 .no-serif，
+     回落到系统宋体栈；http(s) 下不产生任何可见动作。defer 不阻塞首屏。 -->
+<script defer src="js/font-check.js"></script>
+</head>
+<body class="intro" data-theme="shenqing">
+
+<header id="topbar">
+  <!-- 分段进度条：8 段，每段一小节，宽度按该段题量分配 -->
+  <div class="segs" id="segBar"></div>
+  <div class="topline">
+    <div class="brand">I-485 中文填表</div>
+    <div class="counter" id="counter">—</div>
+    <!-- 「目录」按钮（2026-11-09）：打开段/题导航面板，一页清单，
+         8 段分组，点任意一条跳到该题。与「导出」并排：目录在左、导出在右。 -->
+    <button class="btn ghost top-export top-toc" id="btnToc" type="button"
+            title="目录：按段分组列出当前可见的题，点一条直接跳过去"
+            aria-label="目录：按段分组列出当前可见的题，点一条直接跳过去">目录</button>
+    <!-- 「导出」入口（v9 批 9）：答题页（不含切段过渡卡）常驻顶栏右侧。
+         点一下不再直接生成 PDF，而是弹出**三选项面板**（#expPanel）：
+           ① 导出进度（只下 .json，不生成 PDF）② 导出 PDF ③ 下载填写说明
+         「导出进度」下面带一行指导小字：换设备后用「导入答案文件」接着填。
+         样式与目录面板同族（同一个 .toc-panel 家族样式），点遮罩 / ESC 关闭。 -->
+    <button class="btn ghost top-export" id="btnExport" type="button"
+            title="导出：选导出进度（.json）/ 导出 PDF / 下载填写说明"
+            aria-haspopup="dialog" aria-controls="expPanel"
+            aria-label="导出：选择导出进度、导出 PDF 或下载填写说明">导出</button>
+  </div>
+  <div class="partline"><span id="partTitle"></span></div>
+  <div class="dotsline" id="segDots"></div>
+  <!-- 顶栏下方的横条（v9 批 4）：对应 12:10 定稿 mockup 的 .band，
+       高度与颜色按皮肤走（B 4px 深绿浅底 / C 1px 纸色线 / A 1px 纸色线）。 -->
+  <div class="band" aria-hidden="true"></div>
+</header>
+
+<!-- 切段提示横幅（淡入 200ms → 停 1.6s → 淡出 180ms；v9 批 1 改为淡入淡出） -->
+<div id="segBanner" class="seg-banner" hidden></div>
+
+<main id="stage">
+
+  <!-- 开始页（2026-11-11 精简版，老板定）
+       只留一句介绍 + 四个按钮（开始 / 导入 / 关于作者 / 源码）+ 页脚免责声明。
+       删掉的东西：三条「不问你个人身份信息…」、8 段地图 #segMap、
+       「生成 PDF 用的是美国移民局原版表格…」、开始页的导出/导入文字链接
+       和 #ioMsgIntro 那组（导出入口仍在答题页顶栏）。
+       存档逻辑不动：有存档时 #btnStart 文案由 app.js 改成「继续上次（第 N 题）」。
+       「导入答案」沿用旧 id，#fileImportJson 留在原地，bindIoLinks() 直接接上。
+       「关于作者」改成弹面板，内容仍是唯一事实源 #aboutIntro（见页面底部 #aboutPanel）。 -->
+  <section id="view-intro" class="view">
+    <div class="card intro-card">
+      <h1>I-485 问卷式填写工具</h1>
+      <p class="lead">把 I-485 翻成中文问卷，一屏一题问完，直接导出填好的表格。导出后你把 Part 1 和姓名地址这些格子自己补上就齐了。</p>
+      <!-- 开始页两行小字（2026-11-11）：隐私口径，一句一行。
+           纯说明文字，普通 <p> 给屏幕阅读器读；文案逐字定稿，不许改写。 -->
+      <div class="intro-notes">
+        <p>只问选择题，姓名和 SSN 不会出现</p>
+        <p>答案只存在你的浏览器里，不上传</p>
+      </div>
+      <div class="intro-actions">
+        <button class="btn primary big" id="btnStart">开始填表</button>
+        <button class="btn secondary big" id="btnImportJson" type="button">导入答案</button>
+        <button class="btn ghost big" id="btnAbout" type="button"
+                aria-haspopup="dialog" aria-controls="aboutPanel">关于作者</button>
+        <a class="btn ghost big" id="btnSource" href="/source/i485-web-src.zip" download>源码</a>
+      </div>
+      <input class="io-file" id="fileImportJson" type="file" accept="application/json,.json" aria-hidden="true" tabindex="-1">
+      <p class="io-msg intro-msg" id="ioMsgIntro" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- 切段过渡卡：进入新段时出现一次，不计入题库 -->
+  <section id="view-seg" class="view">
+    <div class="card segcard">
+      <div class="segcard-top">
+        <span class="segcard-dot" id="segDot"></span>
+        <span class="segcard-no" id="segNo"></span>
+      </div>
+      <h1 id="segTitle"></h1>
+      <p class="lead" id="segBlurb"></p>
+      <button class="btn primary big" id="btnSegGo">继续</button>
+    </div>
+  </section>
+
+  <!-- 答题页 -->
+  <section id="view-q" class="view">
+    <div class="card question">
+      <div class="qhead">
+        <span class="chip" id="qChip"></span>
+        <span class="qid" id="qId"></span>
+      </div>
+      <h2 id="qTitle"></h2>
+      <details class="enbox" id="qEnBox">
+        <summary>看表上原文怎么问</summary>
+        <p class="en" id="qEn"></p>
+      </details>
+      <p class="hint" id="qHint" hidden></p>
+      <div id="qBody" class="qbody"></div>
+    </div>
+  </section>
+
+  <!-- 完成页 · 结果屏：只讲「答成什么样了 + 要不要回头改」 -->
+  <section id="view-done" class="view">
+    <div class="card">
+      <!-- 中途导出时标题改成「先导出目前的进度」，不许说「答完了」 -->
+      <h1 id="doneTitle">答完了</h1>
+      <p class="lead" id="doneSummary"></p>
+      <div class="pill-row" id="donePills"></div>
+      <h2>查验结果</h2>
+      <p class="tiny" id="chkIntro">下面按表上的要求分档，每一档都写清为什么要列出来。</p>
+      <div id="chkBox"></div>
+      <button class="btn primary big next-step" id="btnToHandoff">下一步：下载和后续</button>
+      <!-- 答案核对页入口（v9 批 3a）：文字链接，不加大按钮 -->
+      <p class="tiny sheet-link-wrap"><a href="#" id="btnSheetFromDone" class="backlink">看答案核对页</a></p>
+      <p class="tiny backlink-wrap"><a href="#" id="btnEditAnswers" class="backlink">有要改的，回去接着答</a></p>
+      <p class="tiny"><a href="/source/i485-web-src.zip">源码（AGPL-3.0）</a></p>
+      <p class="tiny" id="doneDisc">本工具不构成法律意见</p>
+      <button class="btn ghost" id="btnRestart2">重新开始（清空全部答案）</button>
+    </div>
+  </section>
+
+  <!-- 完成页 · 拿表屏：下载两份 PDF + 拿到 PDF 之后怎么走 + 手填清单 -->
+  <section id="view-handoff" class="view">
+    <div class="card" id="handoffCard">
+      <h1>下载和后续</h1>
+      <!-- 中途导出时才出现：说清这次导到第几题、哪些格子留空（🔴 半成品口径，js 分支换文案） -->
+      <p class="lead export-note" id="exportNote" hidden></p>
+      <!-- 下面这几句在「中途导出」时由 app.js 换成半成品口径（js 分支，不靠 CSS 换字）：
+           完整路径一个字不动；半成品路径不许再说「寄走」「一份要交」。 -->
+      <p class="lead" id="handoffLead">两份 PDF 各有用处：一份要交，一份自己留着对照。</p>
+      <div class="dl-row">
+        <div class="dl-item">
+          <button class="btn primary big" id="btnPdf">下载填好的表（27 页）</button>
+          <p class="dl-hint" id="dlHintA">打印这一份，黑笔补空后寄走</p>
+        </div>
+        <div class="dl-item">
+          <button class="btn ghost big" id="btnInstr">下载填写说明（1 页）</button>
+          <p class="dl-hint" id="dlHintB">自己留着对照，不用交</p>
+        </div>
+      </div>
+      <p class="tiny" id="pdfStatus"></p>
+      <p class="tiny" id="instrStatus"></p>
+      <div id="pdfNotes"></div>
+      <div id="doneGuide" class="guide-box">
+        <h2 id="guideTitle">拿到 PDF 之后怎么走</h2>
+        <ol class="guide">
+          <li id="guideStep1">
+            <b id="guideStep1b">只打印官方表那 27 页</b>
+            <span id="guideStep1s">缺页，或几页来自不同版本，移民局可能直接退回。</span>
+          </li>
+          <li id="guideStep2">
+            <b id="guideStep2b">用黑笔补空，别空着交</b>
+            <span id="guideStep2s">姓名、地址、SSN、A-Number、护照/签证号这些格子工具不会填；空着可能被视为未完成。</span>
+          </li>
+          <li id="guideStep3">
+            <b id="guideStep3b">签名并写当天日期</b>
+            <span id="guideStep3s">官网原文：没签名或签名无效，他们会 reject；打印或盖章的名字不算签名。</span>
+          </li>
+          <li id="guideStep4">
+            <b id="guideStep4b">按官网 Filing 页配齐材料再寄</b>
+            <span id="guideStep4s">I-693（如适用，密封原件）、I-864（如适用）、2 张护照照片和这张表一起寄；自己留一份复印件。</span>
+          </li>
+        </ol>
+        <p class="tiny guide-note" id="guideNote">寄到哪里、交多少费用，一律以 USCIS 官网 i-485 页面的 Filing 一栏为准：<a href="https://www.uscis.gov/i-485">uscis.gov/i-485</a></p>
+        <p class="tiny guide-sign" id="guideSign"><b>签名必须手写，盖章或打字的名字不会被接受。</b></p>
+        <h3 class="hw-title">这些格子工具不会填，可以在电脑里直接键入，也可以打印后手写</h3>
+        <p class="tiny" id="hwIntro">其余格子已按你的答案填好，不要覆盖；下面这些格子生成时留空，你可以在 PDF 里直接键入，也可以打印后用黑笔手写。</p>
+        <ul class="hwlist" id="hwList"></ul>
+      </div>
+      <button class="btn ghost big" id="btnBackToResult">回看查验结果</button>
+      <!-- 关于作者（拿表屏，v9 批 1.7）：内容与开始页完全相同（同一份事实源 #aboutIntro），
+           由 app.js 的 cloneAboutPanel() 克隆挂进这个挂载点 —— 位置在免责声明上方。
+           挂载点本身用 display:contents，不产生额外盒子。 -->
+      <div id="aboutHandoffSlot"></div>
+      <p class="tiny" id="handoffDisc">本工具不构成法律意见</p>
+      <!-- 答案导出 / 导入入口（拿表屏，文字链接） -->
+      <div class="io-links" id="ioLinksHandoff">
+        <button class="io-link" id="btnExportJson2" type="button">导出答案文件</button>
+        <button class="io-link" id="btnImportJson2" type="button">导入答案文件</button>
+        <button class="io-link" id="btnSheetFromHandoff" type="button">看答案核对页</button>
+        <input class="io-file" id="fileImportJson2" type="file" accept="application/json,.json" aria-hidden="true" tabindex="-1">
+      </div>
+      <p class="io-msg" id="ioMsgHandoff" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- 答案核对页（v9 批 3a）：把答过的内容排成一页可读、可打印的清单。
+       内容由 I485Render.renderAnswerSheet() 出（渲染层不碰 DOM/存档/事件）；
+       本屏只负责切视图与挂内容。 -->
+  <section id="view-sheet" class="view">
+    <div class="card sheet-card">
+      <div class="sheet-top">
+        <button class="btn ghost sheet-back" id="btnSheetBack" type="button">← 回到结果</button>
+      </div>
+      <div id="sheetBody"></div>
+    </div>
+  </section>
+
+  <!-- 页脚（v9 批 7）：钉死在视口左下角最底部的一条，左对齐、底色不透明。
+       三件 = 已自动保存 / 本工具不构成法律意见 / 颜色模板色点；技术说明只在开始页出现
+       （style.css 的 body:not(.intro) .tech 已隐藏）。高度由 app.js 的 fitFooter()
+       实测后写进 --foot-h，底栏 #navbar 抬到页脚上方，#stage 的 padding-bottom 同步让位。 -->
+  <footer id="foot">
+    <!-- 「已自动保存 · HH:MM」（仅答题页显示；JS 按最后一次 save() 成功的时刻写） -->
+    <p class="savetime" id="saveTime" aria-live="polite"></p>
+    <details class="tech">
+      <summary>技术说明</summary>
+      <p class="technote" id="introMeta"></p>
+    </details>
+    <p class="tiny" id="footDisc">本工具不构成法律意见</p>
+    <!-- 皮肤切换（v9 批 7）：色点 12px → 22px，前面加可见文字「颜色模板」。
+         老板原话就是「颜色模板」，所以可见文字只许用这四个字
+         （不用「外观」「主题」）；色点的 title / aria-label 保留现有中文名。 -->
+    <div class="theme-dots-wrap">
+      <span class="theme-dots-label" id="themeDotsLabel">颜色模板</span>
+      <div class="theme-dots" id="themeDots" role="group" aria-label="颜色模板">
+        <button class="theme-dot" type="button" data-theme="shenqing" aria-label="深青外观" title="深青外观" aria-pressed="true"></button>
+        <button class="theme-dot" type="button" data-theme="nuanzhu" aria-label="暖朱外观" title="暖朱外观" aria-pressed="false"></button>
+        <button class="theme-dot" type="button" data-theme="wenshu" aria-label="文书外观" title="文书外观" aria-pressed="false"></button>
+      </div>
+    </div>
+  </footer>
+
+</main>
+
+<footer id="navbar">
+  <button class="btn ghost" id="btnPrev">上一题</button>
+  <button class="btn primary" id="btnNext">下一题</button>
+</footer>
+
+<div id="toast" class="toast" hidden></div>
+
+<!-- 段/题目录面板（2026-11-09）
+     一页清单：8 段分组，每段标题 + 该段当前可见题数，下面列出该段题目。
+     编号 =「段号-段内序号」（如 4-3）。段内序号按「当前可见题」算 ——
+     与顶栏「本段已答 a / b」同一套算法（条件题跟着答案增减，用题库写死序号会跳错题）。
+     点任意一条 → 跳到该题；ESC 或点遮罩关闭。开/关不影响存档，也不改当前题。 -->
+<div id="tocOverlay" class="toc-overlay" hidden></div>
+<div id="tocPanel" class="toc-panel" role="dialog" aria-modal="true" aria-label="目录：段与题目" hidden>
+  <div class="toc-head">
+    <div class="toc-head-title">目录</div>
+    <button class="toc-close" id="tocClose" type="button" aria-label="关闭目录">×</button>
+  </div>
+  <p class="toc-note">编号「段号-段内序号」；段内序号按<b>当前可见题</b>算，与顶栏「本段已答 a / b」同一套算法（条件题跟着答案增减，序号会重排）。</p>
+  <!-- v9 批 7：目录里加「回看查验结果」固定条目（老板第三次提）。
+       位置固定在 .toc-note 下方、题目清单上方，单独一行 + 细分隔线，
+       与题目条目明显区分。点击 = 关目录 → 打开 #view-sheet（复用 showSheet()）。 -->
+  <button class="toc-sheet" id="tocSheetLink" type="button">回看查验结果</button>
+  <!-- v9 批 9：目录里加「导入页」固定条目（老板指定名字，只这三个字）。
+       位置：与「回看查验结果」同一组（固定条目区），与题目清单明显分隔。
+       点击 = 关目录 → 回到开始页 #view-intro（等同回首页）。
+       答案不许清空：只切视图，不碰 state.answers / 存档。 -->
+  <button class="toc-sheet" id="tocImportLink" type="button">导入页</button>
+  <div class="toc-list" id="tocList"></div>
+  <!-- v9 批 8：目录面板最下面（#tocList 之后）加「关于作者」折叠块。
+       事实源仍然只有开始页那份 #aboutIntro —— 这里**只放一个挂载点**，
+       由 app.js 的 cloneAboutPanel() 从 #aboutIntro 克隆（全站不出现第二份文案）。
+       原生 <details>/<summary>，默认收起；展开后的内容在面板内，
+       面板本身可滚动 → 不会被裁掉，也不横向溢出。 -->
+  <div id="aboutTocSlot" class="toc-about"></div>
+</div>
+
+<!-- 导出三选项面板（v9 批 9）
+     点顶栏「导出」→ 弹这个面板，三条各自一行：
+       ① 导出进度（只下载答案 .json，不生成 PDF；下面带一行指导小字）
+       ② 导出 PDF（等同 generate()）
+       ③ 下载填写说明（等同 generateInstructions()）
+     与目录面板同族：同一个 .toc-overlay / .toc-panel 家族样式（不带新配色），
+     点遮罩或 ESC 关闭；打开后焦点进面板，Tab 焦点不出面板。 -->
+<div id="expOverlay" class="toc-overlay" hidden></div>
+<div id="expPanel" class="toc-panel exp-panel" role="dialog" aria-modal="true" aria-labelledby="expPanelTitle" hidden>
+  <div class="toc-head">
+    <div class="toc-head-title" id="expPanelTitle">导出</div>
+    <button class="toc-close" id="expClose" type="button" aria-label="关闭导出面板">×</button>
+  </div>
+  <div class="exp-list" id="expList">
+    <button class="exp-item" id="btnExpProgress" type="button">
+      <span class="exp-item-title">导出进度</span>
+      <span class="exp-item-hint">导出这个文件后，换别的设备打开本页，用「导入答案文件」导入它，就能接着上次的进度继续填。</span>
+    </button>
+    <button class="exp-item" id="btnExpPdf" type="button">
+      <span class="exp-item-title">导出 PDF</span>
+      <span class="exp-item-hint">把现在的答案填进官方表（27 页），下载 PDF。</span>
+    </button>
+    <button class="exp-item" id="btnExpInstr" type="button">
+      <span class="exp-item-title">下载填写说明</span>
+      <span class="exp-item-hint">1 页说明，自己留着对照，不用交。</span>
+    </button>
+  </div>
+</div>
+
+<!-- 关于作者面板（2026-11-11）：开始页「关于作者」按钮打开的面板。
+     内容没有第二份文案 —— #aboutIntro 本体就放在这个面板里（全站唯一事实源），
+     拿表屏（#aboutHandoffSlot）与目录面板底部（#aboutTocSlot）那两份仍由
+     app.js 的 cloneAboutPanel() 从它克隆。面板与目录 / 导出面板同族
+     （.toc-panel / .toc-overlay），点遮罩或 ESC 关闭。 -->
+<div id="aboutOverlay" class="toc-overlay" hidden></div>
+<div id="aboutPanel" class="toc-panel about-panel" role="dialog" aria-modal="true" aria-labelledby="aboutPanelTitle" hidden>
+  <div class="toc-head">
+    <div class="toc-head-title" id="aboutPanelTitle">关于作者</div>
+    <button class="toc-close" id="aboutClose" type="button" aria-label="关闭关于作者">×</button>
+  </div>
+  <div class="about-panel-body" id="aboutPanelBody">
+    <details class="about" id="aboutIntro" open>
+      <summary>关于作者 ▾</summary>
+      <div class="about-body">
+        <p class="about-name">于先生 · 注册税务师（Enrolled Agent）</p>
+        <p class="about-svc">个人报税 · 新移民税务 · 身份与财务规划咨询</p>
+        <p class="about-line">小红书：<span class="about-handle">@美国落地于先生</span></p>
+        <p class="about-line about-mail"><span class="about-mail-text">邮箱：chenbinyu0 [at] gmail [dot] com</span> <button class="about-copy" type="button" aria-label="复制邮箱地址">［复制］</button></p>
+        <p class="about-msg" role="status" aria-live="polite"></p>
+      </div>
+    </details>
+  </div>
+</div>
+
+<script src="libs/pdf-lib.min.js"></script>
+<script src="data/template-b64.js"></script>
+<script src="data/assets-b64.js"></script>
+<script src="js/core.js"></script>
+<script src="js/instructions.js"></script>
+<script src="sections.js"></script>
+<script src="data/questions.js"></script>
+<script src="data/handwrite.js"></script>
+<!-- 排版层（v9 批 2）：经典 script，file:// 下不能用 ES module -->
+<script src="render.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
