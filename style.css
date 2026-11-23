@@ -113,6 +113,9 @@ body.intro .segs, body.intro .counter { display: none; }
 .topline {
   display: flex; align-items: center; justify-content: flex-start;
   gap: 12px; padding: 0 18px;
+  /* 2026-11-19：计数不再收缩截断。极窄 + 放大字号（320 宽 × 2 倍字）连计数加两颗按钮都放不下时，
+     按钮折到下一行，不出屏、不压字；正常字号下 320–430 宽都是一行。 */
+  flex-wrap: wrap; row-gap: 4px;
 }
 .brand {
   /* v9 批 5：品牌行对齐 mockup 的 .brand（17px / 700 / 字距 .3px / 行高 1.5）。 */
@@ -120,17 +123,25 @@ body.intro .segs, body.intro .counter { display: none; }
   /* 2026-11-09 修（法正复审 E）：品牌名可收缩。
      原来写死 flex:0 0 auto —— 320 宽 + 2× 字号时挤不下，
      只能把顶栏右侧的「导出」按钮顶出屏幕（右侧溢出 24px）。
-     改成可收缩 + 省略号后，挤不下时先截断品牌名，按钮永远留在屏内。 */
-  flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis;
+     改成可收缩 + 省略号后，挤不下时先截断品牌名，按钮永远留在屏内。
+     2026-11-19：基准宽 0、占满剩余空间（flex: 1 1 0）—— 品牌名只用计数和按钮剩下的地方，
+     计数不再跟它分摊收缩。 */
+  flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis;
   white-space: nowrap;
 }
 .counter {
   font-size: 15px; color: var(--muted); font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-  /* 顶栏右侧有「随时导出」按钮时，计数自己让位（截断加省略号），
-     按钮绝不被挤出屏幕 —— 430 宽下 brand + counter + 按钮必须一行放得下。 */
-  margin-left: auto; flex: 0 1 auto; min-width: 0;
-  overflow: hidden; text-overflow: ellipsis;
+  /* 2026-11-19：计数不再截断（430 宽曾显示成「第 131 题 / 约 15…」）。
+     app.js 把「第 n 题」与「/ 约 N 题」拆成两段；一行放不下时在两段之间换行，数字永远完整。
+     计数不收缩（flex: 0 0 auto），挤不下时先截品牌名，再不够按钮折行（见 .topline）。 */
+  margin-left: auto; flex: 0 0 auto;
+  white-space: normal; text-align: right; line-height: 1.25;
+}
+.counter > span { display: inline-block; white-space: nowrap; }
+/* 手机宽度：两段固定上下叠放（「第 n 题」/「/ 约 N 题」），计数只占较长那一段的宽度，
+   品牌名少被挤。两行 × 19px 在 44px 高的顶栏行内放得下，顶栏不长高。 */
+@media (max-width: 520px) {
+  .counter > span { display: block; }
 }
 
 /* 顶栏「随时导出」按钮（2026-11-09）
@@ -390,6 +401,20 @@ hr { border: 0; border-top: 0.5px solid var(--line); margin: var(--gap) 0; }
 html.no-serif .numeral {
   font-family: "Songti SC", "Noto Serif CJK SC", SimSun, serif;
 }
+
+/* 2026-11-11 定稿：字号按**字符数**缩（官方 Item 号有 1–4 字符：
+ *   "18" / "43.b" / "82.c"），防止 4 字符撑出卡片。
+ *   1–2 字符 → 原字号（--t-numeral-size，不动）
+ *   3 字符   → ×0.66
+ *   4 字符   → ×0.52
+ * 系数写进 .numeral 的 data-len（render.js 渲染时算好），用属性选择器缩放。
+ * --t-numeral-* token 全部保留：缩放是对 token 值的再加工，不改 token 本身。 */
+.numeral[data-len="3"] {
+  font-size: calc(var(--t-numeral-size, 48px) * 0.66);
+}
+.numeral[data-len="4"] {
+  font-size: calc(var(--t-numeral-size, 48px) * 0.52);
+}
 /* 内容压在大数字之上（mockup 的 .cardbody{position:relative;z-index:1}）。
    .qbody 必须保持 static —— 大数字是它的子节点，static 才能让
    position:absolute 相对「题卡」定位（mockup 里它相对 .card 定位）。 */
@@ -536,17 +561,51 @@ body.gate #foot { display: none; }
 .field { margin-bottom: 16px; }
 .field label { display: block; font-size: 16px; line-height: 1.75; color: var(--ink-faint2); margin-bottom: 8px; }
 .field label small { display: block; color: var(--muted); font-size: 14px; line-height: 1.6; font-weight: 400; margin-top: 2px; }
-.field input[type="text"], .field input[type="number"], .field input[type="date"], .field select {
+.field input[type="text"], .field input[type="number"], .field input[type="date"], .field select, .field textarea {
   width: 100%; min-height: var(--btn-h); padding: 12px 14px;
   font-size: 18px; line-height: 1.5; font-family: inherit;
   color: var(--ink); background: var(--card);
   border: 1px solid var(--line); border-radius: var(--radius-input); outline: none;
 }
 .field input:focus, .field select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+/* 多行框（第 62 项「一行写一项」）：4 行起步、可往下拉高；长句自动折行，手机上看得见全文。 */
+.field textarea { display: block; min-height: calc(4 * 1.5em + 26px); resize: vertical; white-space: pre-wrap; overflow-wrap: anywhere; }
+.field textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .field .sub { font-size: 16px; line-height: 1.75; color: var(--muted); margin-top: 8px; }
 /* 国名 9 字符校验提示：与上方「请用英文或拼音填写」拉开 8px，14px 小字更省地方 */
 .field .sub.limitmsg { margin-top: 8px; font-size: 14px; line-height: 1.5; max-width: 21em; text-wrap: pretty; }
 .field .sub.limitmsg.bad { color: var(--danger); }
+
+/* ---------- 单位切换（v11：身高厘米 / 体重公斤）----------
+   两个等宽按钮，选中的那个用强调色描边 + 浅底；未选中的是次级灰。
+   换算结果行比正文小一号：成功用正文墨色（要人核对的地方，不能太弱），
+   越界用警示红。间距都取 8 的倍数，与题卡其余节奏一致。 */
+.unit-switch { display: flex; gap: 8px; margin: 0 0 16px; }
+.unit-switch .unit-opt {
+  flex: 1 1 0; min-height: 48px; padding: 8px 10px;
+  border: 1px solid var(--line); border-radius: 12px;
+  background: var(--card); color: var(--ink-mute);
+  font: inherit; font-size: 15px; line-height: 1.4; cursor: pointer;
+  text-align: center; text-wrap: balance;
+}
+.unit-switch .unit-opt.on {
+  border-color: var(--accent); color: var(--accent);
+  background: var(--soft-gray); font-weight: 600;
+}
+.unit-switch .unit-opt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.unit-conv { margin: 8px 0 0; font-size: 14px; line-height: 1.6; color: var(--muted); text-wrap: pretty; }
+.unit-conv.ok { color: var(--ink); }
+.unit-conv.bad { color: var(--danger); }
+/* 切模式提示（v13 M2）：当前模式空、另一模式有值。琥珀色小字，与转换结果区分开。 */
+.unit-mode-note {
+  margin: -6px 0 14px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--warn);
+  text-wrap: pretty;
+}
+.unit-mode-note[hidden] { display: none; }
+.unit-follow { margin: 0 0 8px; font-size: 15px; line-height: 1.7; color: var(--ink-mute); text-wrap: pretty; }
 
 /* 汇总 */
 .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 var(--gap); }
@@ -1040,6 +1099,37 @@ body.intro .savetime, body.seg .savetime, body.done .savetime { display: none; }
 #aboutPanel .about summary { display: none; }
 #aboutPanel .about-body { margin: 0; }
 
+/* 更新说明（v13）：弹层最底下一节。作者信息在前，这一节在后面；
+   上面一条分隔线，日期 14px 深色、条目 14px 灰字，一行一条不折成多段。
+   两段日期之间留一行空（.changelog-group 之间的 margin）。 */
+.changelog {
+  margin: 16px 0 4px;
+  padding-top: 14px;
+  border-top: 0.5px solid var(--line);
+}
+.changelog-title {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.changelog-group + .changelog-group { margin-top: 1em; }
+.changelog-date {
+  margin: 0 0 2px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.changelog-item {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--muted);
+  /* 条目文字不溢出弹层：长句在弹层内换行，不撑出横向滚动 */
+  overflow-wrap: anywhere;
+}
+
 /* 技术说明：默认收起，13px 灰字，不占正文注意力 */
 .tech { margin: 0 0 6px; max-width: none; }
 /* 开始页页脚：内边距由 #foot 统一给，技术说明与免责声明自然同一条左边缘 */
@@ -1269,4 +1359,49 @@ body:not(.intro) .tech { display: none; }
     border: 0.5pt solid var(--ink);
   }
   .as-foot { border-top: 0.5pt solid var(--line); }
+}
+
+/* ---------- 附加白纸（v12：住址超过表上 18 条容量） ----------
+   屏幕：拿表屏里一行说明 + 一颗按钮；白纸本体 display:none。
+   打印：body.print-extra 时隐掉页面其余部分，只印这张纸（Letter、白底、黑字）。 */
+.extra-sheet-cta { margin: 14px 0 2px; }
+.extra-sheet-cta .tiny { margin: 0 0 8px; }
+#extraSheetPrint { display: none; }
+
+@media print {
+  /* 这张纸按 Letter 排（官方表也是 Letter）；不给 margin，页边距由 #extraSheetPrint 的 padding 控制 */
+  @page { size: letter; }
+  body.print-extra { background: #fff !important; color: #000 !important; }
+  body.print-extra > * { display: none !important; }
+  body.print-extra #extraSheetPrint {
+    display: block !important;
+    padding: 0.55in 0.6in;
+    background: #fff !important;
+    color: #000 !important;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.35;
+  }
+  #extraSheetPrint .es-title { font-size: 13pt; font-weight: 700; margin: 0 0 10pt; }
+  #extraSheetPrint .es-meta { font-size: 10.5pt; margin: 0 0 6pt; }
+  /* 正文的「22 个汉字行长」不适用于这张英文纸：表头/页脚各占一行，不折行 */
+  #extraSheetPrint .es-title,
+  #extraSheetPrint .es-meta,
+  #extraSheetPrint .es-foot { max-width: none; }
+  #extraSheetPrint .es-list { margin: 10pt 0 0; }
+  #extraSheetPrint .es-item {
+    display: grid;
+    grid-template-columns: 2.4em 1fr;
+    margin: 0 0 9pt;
+    break-inside: avoid; page-break-inside: avoid;
+  }
+  #extraSheetPrint .es-no { font-weight: 700; }
+  #extraSheetPrint .es-lines { white-space: normal; }
+  #extraSheetPrint .es-blank { color: #000; }
+  #extraSheetPrint .es-foot {
+    margin: 14pt 0 0;
+    padding-top: 6pt;
+    border-top: 0.5pt solid #000;
+    font-size: 9pt;
+  }
 }

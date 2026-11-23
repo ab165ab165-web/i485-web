@@ -92,6 +92,26 @@
   var TITLE_TEXT = '以下格子工具不会填：可以在电脑里键入，也可以打印后手写';
   var BOTTOM_TEXT = '其余格子已按你的答案填好，不要覆盖。';
   var SIGN_TEXT = '签名必须手写，盖章或打字的签名 USCIS 不接受。';
+  /* 住址提醒（v10 批 C，v12 补一句）：为什么必须写全 —— 表上只留一个前住址格，
+   * 第 2 条起由工具写进 Part 14；漏一条 = Part 1 第 18 项没答完。v12：表上容量
+   * 是 18 条，再往前的由工具排进附加白纸，随表一起打印（与完成页同一句）。
+   * 两句都 ≤48 字，10.5pt 在 522pt 可用宽内不需要缩字。 */
+  var REMINDER_L1 = '五年内住过的地址要写全：表上只留一个前住址格，第 2 条起由工具写进 Part 14。';
+  var REMINDER_L2 = '漏一条，Part 1 第 18 项就不算答完。超过 18 条住址时用附加白纸，随表一起打印。';
+
+  /* v12：Part 14 装不下时的完整交代（老板 22:32 点名要写进 B 文件）。
+   * 两句一组，10.5pt 下各自 < 522pt（不缩字号）：
+   *   「Part 14 只有 16 行 → 超出的打在随表白纸上 → 白纸注明 Page/Part/Item → 与表一起装订」
+   * Page/Part/Item 由调用方从题库契约（residence.part14）传进来，不在这里另立一套页码。
+   * 完成页的附加白纸说明调同一个函数 —— 两处措辞由构造保证一致。 */
+  function part14SheetLines(ref) {
+    ref = ref || {};
+    return [
+      'Part 14 只有 16 行；住址超过 18 条时，超出的部分打在随表的附加白纸上，',
+      '白纸注明 Page ' + (ref.pgno || '3') + ' / Part ' + (ref.ptno || '1') +
+        ' / Item ' + (ref.itno || '18') + '，与表一起装订。'
+    ];
+  }
 
   /* opts: { parts:[{no,title,count,cats}], totalFields:number, uncertainCount:number }
    * uncertainCount 只影响「另有 N 题…」那一句 —— 而那句话在构建期已经烘进
@@ -128,8 +148,35 @@
       text: '共 ' + total + ' 格，按表上的 Part 归并如下（每一行 = 一个 Part）：'
     }));
 
-    /* 12 行 Part 清单：左边 Part 名 + 类别，右边格数 */
-    var y = ROW_FIRST;
+    /* 住址提醒（放在 Part 清单正上方：读到清单之前先看到「为什么必须写全」）
+     * v12：第 3、4 行讲 Part 14 另附白纸；行距仍是 16pt（10.5pt 字号 ≥ 1.1 倍），
+     * 清单首行从 -114 让到 -140，给第 4 行留 20pt 净空。 */
+    var sheetLines = part14SheetLines(opts.partRef);
+    ops.push(opText('reminder', {
+      x: M, y: BANNER_BOTTOM - 72, size: 10.5, bold: true, color: COLOR.warn, maxW: RIGHT - M,
+      text: REMINDER_L1
+    }));
+    ops.push(opText('reminder', {
+      x: M, y: BANNER_BOTTOM - 88, size: 10.5, bold: false, color: COLOR.warn, maxW: RIGHT - M,
+      text: REMINDER_L2
+    }));
+    ops.push(opText('reminder', {
+      x: M, y: BANNER_BOTTOM - 104, size: 10.5, bold: false, color: COLOR.warn, maxW: RIGHT - M,
+      text: sheetLines[0]
+    }));
+    ops.push(opText('reminder', {
+      x: M, y: BANNER_BOTTOM - 120, size: 10.5, bold: false, color: COLOR.warn, maxW: RIGHT - M,
+      text: sheetLines[1]
+    }));
+
+    /* Part 清单：左边 Part 名 + 类别，右边格数。
+     * 行数会随手写清单变（Part 8 体重写进 PDF 后整段消失 → 11 行），
+     * 所以行距按「清单顶部到底部安全线」算，行数多时自动收紧，绝不压到分隔线。 */
+    var rowsTop = BANNER_BOTTOM - 140;
+    var rowsFloor = RULE_Y + 34;
+    var n = parts.length;
+    var step = (n > 1) ? Math.min(ROW_STEP, (rowsTop - rowsFloor) / (n - 1)) : ROW_STEP;
+    var y = rowsTop;
     for (var i = 0; i < parts.length; i++) {
       var p = parts[i] || {};
       var label = stripParen(p.title) + '：' + joinCats(p.cats);
@@ -140,7 +187,7 @@
         x: RIGHT, y: y, size: 10.5, bold: true, color: COLOR.count, maxW: 62, align: 'right',
         text: (Number(p.count || 0) + ' 格')
       }));
-      y -= ROW_STEP;
+      y -= step;
     }
 
     /* 分隔线 + 底部一句 */
@@ -198,6 +245,9 @@
   }
 
   function baseAssetName() { return 'assets/cover-instructions.png'; }
+  /* v12：B 文件的**文字层**（不可见、只供检索/复制）。整页仍是那张 PNG，
+     文字层是构建期用 Chromium 打的同坐标透明文本，运行时叠加在图上。 */
+  function textLayerAssetName() { return 'assets/cover-instructions-text.pdf'; }
 
   return {
     LETTER: LETTER,
@@ -211,10 +261,14 @@
     TITLE_TEXT: TITLE_TEXT,
     BOTTOM_TEXT: BOTTOM_TEXT,
     SIGN_TEXT: SIGN_TEXT,
+    REMINDER_L1: REMINDER_L1,
+    REMINDER_L2: REMINDER_L2,
+    part14SheetLines: part14SheetLines,
     buildLayout: buildLayout,
     buildUncertainLayout: buildUncertainLayout,
     stripAssetName: stripAssetName,
     baseAssetName: baseAssetName,
+    textLayerAssetName: textLayerAssetName,
     stripParen: stripParen
   };
 });

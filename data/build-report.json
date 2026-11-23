@@ -465,7 +465,7 @@
       "section": "preparer-info"
     }
   ],
-  "conditionalQuestions": 66,
+  "conditionalQuestions": 295,
   "excludedSections": [
     "info-about-you"
   ],
@@ -474,14 +474,14 @@
   },
   "excludedControls": 108,
   "danglingConditions": [],
-  "questions": 173,
+  "questions": 409,
   "bySection": {
     "application-type": 21,
     "request-for-exemption": 1,
     "additional-info": 14,
     "marital-history": 16,
     "children-info": 5,
-    "biographic-info": 6,
+    "biographic-info": 7,
     "9a": 23,
     "9b": 21,
     "9c": 28,
@@ -489,7 +489,9 @@
     "9e": 7,
     "9f": 6,
     "9g": 10,
-    "interpreter-info": 1
+    "interpreter-info": 1,
+    "a-number": 2,
+    "residence": 233
   },
   "oneOf": 2,
   "unresolvedConditions": [],
@@ -497,8 +499,8 @@
   "titleZh": {
     "tableEntries": 59,
     "appliedFromTable": 59,
-    "withZh": 173,
-    "total": 173,
+    "withZh": 409,
+    "total": 409,
     "missing": [],
     "orphanKeys": [],
     "byKind": {
@@ -507,11 +509,505 @@
       "A": 32
     }
   },
-  "hintZh": 173,
+  "hintZh": 409,
   "missingHints": [],
   "detailsField": 65,
   "titleZhRewritten": 49,
   "gatesChildren": [
+    {
+      "id": "a-number|r:a_number",
+      "section": "a-number",
+      "item": "",
+      "noPdf": false,
+      "refs": [
+        "a_number_yes"
+      ]
+    },
+    {
+      "id": "residence|phys:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "phys_in_us_yes",
+        "phys_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|phys:from",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "residing_address_no"
+      ]
+    },
+    {
+      "id": "residence|h1:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h1_in_us_yes",
+        "h1_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|h1:more",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h1_more_yes"
+      ]
+    },
+    {
+      "id": "residence|h2:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h2_in_us_yes",
+        "h2_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|h2:more",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h2_more_yes"
+      ]
+    },
+    {
+      "id": "residence|h3:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h3_in_us_yes",
+        "h3_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|h3:more",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h3_more_yes"
+      ]
+    },
+    {
+      "id": "residence|h4:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h4_in_us_yes",
+        "h4_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|h4:more",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h4_more_yes"
+      ]
+    },
+    {
+      "id": "residence|h5:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h5_in_us_yes",
+        "h5_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|h5:more",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h5_more_yes"
+      ]
+    },
+    {
+      "id": "residence|h6:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h6_in_us_yes",
+        "h6_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|h6:more",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h6_more_yes"
+      ]
+    },
+    {
+      "id": "residence|h7:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h7_in_us_yes",
+        "h7_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|h7:more",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h7_more_yes"
+      ]
+    },
+    {
+      "id": "residence|h8:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h8_in_us_yes",
+        "h8_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|h8:more",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h8_more_yes"
+      ]
+    },
+    {
+      "id": "residence|h9:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h9_in_us_yes",
+        "h9_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|h9:more",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h9_more_yes"
+      ]
+    },
+    {
+      "id": "residence|h10:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h10_in_us_yes",
+        "h10_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|h10:more",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h10_more_yes"
+      ]
+    },
+    {
+      "id": "residence|h11:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h11_in_us_yes",
+        "h11_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|h11:more",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h11_more_yes"
+      ]
+    },
+    {
+      "id": "residence|h12:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h12_in_us_yes",
+        "h12_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|h12:more",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h12_more_yes"
+      ]
+    },
+    {
+      "id": "residence|h13:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h13_in_us_yes",
+        "h13_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|h13:more",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h13_more_yes"
+      ]
+    },
+    {
+      "id": "residence|h14:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h14_in_us_yes",
+        "h14_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|h14:more",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h14_more_yes"
+      ]
+    },
+    {
+      "id": "residence|h15:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h15_in_us_yes",
+        "h15_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|h15:more",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h15_more_yes"
+      ]
+    },
+    {
+      "id": "residence|h16:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h16_in_us_yes",
+        "h16_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|h16:more",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h16_more_yes"
+      ]
+    },
+    {
+      "id": "residence|h17:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h17_in_us_yes",
+        "h17_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|h17:more",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h17_more_yes"
+      ]
+    },
+    {
+      "id": "residence|h18:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h18_in_us_yes",
+        "h18_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|h18:more",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h18_more_yes"
+      ]
+    },
+    {
+      "id": "residence|h19:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h19_in_us_yes",
+        "h19_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|h19:more",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h19_more_yes"
+      ]
+    },
+    {
+      "id": "residence|h20:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h20_in_us_yes",
+        "h20_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|h20:more",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h20_more_yes"
+      ]
+    },
+    {
+      "id": "residence|h21:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h21_in_us_yes",
+        "h21_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|h21:more",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h21_more_yes"
+      ]
+    },
+    {
+      "id": "residence|h22:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h22_in_us_yes",
+        "h22_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|h22:more",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h22_more_yes"
+      ]
+    },
+    {
+      "id": "residence|h23:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h23_in_us_yes",
+        "h23_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|h23:more",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h23_more_yes"
+      ]
+    },
+    {
+      "id": "residence|h24:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h24_in_us_yes",
+        "h24_in_us_no"
+      ]
+    },
+    {
+      "id": "residence|h24:more",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h24_more_yes"
+      ]
+    },
+    {
+      "id": "residence|h25:in_us",
+      "section": "residence",
+      "item": "18",
+      "noPdf": false,
+      "refs": [
+        "h25_in_us_yes",
+        "h25_in_us_no"
+      ]
+    },
     {
       "id": "application-type|r:i485_role",
       "section": "application-type",
@@ -714,15 +1210,15 @@
   ],
   "optionZh": {
     "tableEntries": 155,
-    "total": 355,
-    "withZh": 355,
+    "total": 537,
+    "withZh": 537,
     "missing": [],
     "orphanKeys": []
   },
   "inputZh": {
     "tableEntries": 84,
-    "total": 84,
-    "withZh": 84,
+    "total": 347,
+    "withZh": 347,
     "missing": [],
     "orphanKeys": []
   },
@@ -735,12 +1231,12 @@
     "titleOrphanKeys": []
   },
   "handwrite": {
-    "totalFields": 315,
+    "totalFields": 194,
     "parts": [
       {
         "id": "info-about-you",
         "no": 1,
-        "count": 141
+        "count": 87
       },
       {
         "id": "application-type",
@@ -768,11 +1264,6 @@
         "count": 12
       },
       {
-        "id": "biographic-info",
-        "no": 8,
-        "count": 3
-      },
-      {
         "id": "9d",
         "no": 9,
         "count": 1
@@ -795,10 +1286,10 @@
       {
         "id": "additional-info-page",
         "no": 14,
-        "count": 76
+        "count": 12
       }
     ],
-    "writtenAny": 431,
+    "writtenAny": 552,
     "structural": [
       "meta_form_name",
       "meta_formdata"
@@ -812,7 +1303,7 @@
     "additional-info": 14,
     "marital-history": 16,
     "children-info": 5,
-    "biographic-info": 6,
+    "biographic-info": 7,
     "9a": 23,
     "9b": 21,
     "9c": 28,
@@ -820,6 +1311,8 @@
     "9e": 7,
     "9f": 6,
     "9g": 10,
-    "interpreter-info": 1
+    "interpreter-info": 1,
+    "a-number": 2,
+    "residence": 233
   }
 }

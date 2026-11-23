@@ -1,15 +1,15 @@
 {
- "generatedAt": "2026-11-09T18:34:01.713Z",
+ "generatedAt": "2026-11-20T01:29:05.172Z",
  "sourcePdf": "vendor/fillvisa-i485/fillvisa_i-485-acro.pdf",
  "sourcePdfSha256": "330a28d41e8b6ff1f6ab6b90363836dd74ddcfbc25c86d9a8c7cb57c2490f7e2",
  "rule": "所有 PDF 可填格 − 题库任一题可能写入的格 − 表单内部元数据 = 需要用户手写的格",
- "totalFields": 315,
+ "totalFields": 194,
  "parts": [
   {
    "id": "info-about-you",
    "no": 1,
    "title": "Part 1 · 关于你（Information About You）",
-   "count": 141,
+   "count": 87,
    "cats": [
     "姓名",
     "A-Number",
@@ -19,36 +19,6 @@
     "其他"
    ],
    "fields": [
-    "a-number",
-    "a-number-1",
-    "a-number-10",
-    "a-number-11",
-    "a-number-12",
-    "a-number-13",
-    "a-number-14",
-    "a-number-15",
-    "a-number-16",
-    "a-number-17",
-    "a-number-18",
-    "a-number-19",
-    "a-number-2",
-    "a-number-20",
-    "a-number-21",
-    "a-number-22",
-    "a-number-23",
-    "a-number-24",
-    "a-number-25",
-    "a-number-26",
-    "a-number-27",
-    "a-number-3",
-    "a-number-4",
-    "a-number-5",
-    "a-number-6",
-    "a-number-7",
-    "a-number-8",
-    "a-number-9",
-    "a_number_no",
-    "a_number_yes",
     "alien_crewman_no",
     "alien_crewman_yes",
     "city_of_birth",
@@ -56,7 +26,6 @@
     "consent_disclosure_yes",
     "country_of_birth",
     "country_of_citizenship",
-    "current_flr",
     "current_immigration_expiration_date",
     "current_immigration_status",
     "dob",
@@ -102,29 +71,8 @@
     "passport_expiration_date",
     "passport_issued_country",
     "passport_number",
-    "physical_apt",
-    "physical_city",
     "physical_incare_of_name",
-    "physical_number",
-    "physical_reside_date",
-    "physical_state",
-    "physical_ste",
-    "physical_street",
-    "physical_zip",
-    "prior_apt",
-    "prior_city",
-    "prior_country",
-    "prior_flr",
     "prior_incare_of_name",
-    "prior_number",
-    "prior_postal",
-    "prior_province",
-    "prior_reside_date_from",
-    "prior_reside_date_to",
-    "prior_state",
-    "prior_ste",
-    "prior_street",
-    "prior_zip",
     "recent_apt",
     "recent_city",
     "recent_country",
@@ -138,8 +86,6 @@
     "recent_ste",
     "recent_street",
     "recent_zip",
-    "residing_address_no",
-    "residing_address_yes",
     "sex_female",
     "sex_male",
     "ssn_issued_no",
@@ -162,148 +108,6 @@
     "visa_number"
    ],
    "groups": [
-    {
-     "label": "4. Do you have an Alien Registration Number (A-Number)?",
-     "fields": [
-      {
-       "pdf": "a-number",
-       "box": "4. Do you have an Alien Registration Number (A-Number)? — A-Number (if any)"
-      },
-      {
-       "pdf": "a_number_no",
-       "box": "4. Do you have an Alien Registration Number (A-Number)? — Yes — No"
-      },
-      {
-       "pdf": "a_number_yes",
-       "box": "4. Do you have an Alien Registration Number (A-Number)? — Yes"
-      }
-     ]
-    },
-    {
-     "label": "（表上无单独题面）",
-     "fields": [
-      {
-       "pdf": "a-number-1",
-       "box": "a-number-1"
-      },
-      {
-       "pdf": "a-number-10",
-       "box": "a-number-10"
-      },
-      {
-       "pdf": "a-number-11",
-       "box": "a-number-11"
-      },
-      {
-       "pdf": "a-number-12",
-       "box": "a-number-12"
-      },
-      {
-       "pdf": "a-number-13",
-       "box": "a-number-13"
-      },
-      {
-       "pdf": "a-number-14",
-       "box": "a-number-14"
-      },
-      {
-       "pdf": "a-number-15",
-       "box": "a-number-15"
-      },
-      {
-       "pdf": "a-number-16",
-       "box": "a-number-16"
-      },
-      {
-       "pdf": "a-number-17",
-       "box": "a-number-17"
-      },
-      {
-       "pdf": "a-number-18",
-       "box": "a-number-18"
-      },
-      {
-       "pdf": "a-number-19",
-       "box": "a-number-19"
-      },
-      {
-       "pdf": "a-number-2",
-       "box": "a-number-2"
-      },
-      {
-       "pdf": "a-number-20",
-       "box": "a-number-20"
-      },
-      {
-       "pdf": "a-number-21",
-       "box": "a-number-21"
-      },
-      {
-       "pdf": "a-number-22",
-       "box": "a-number-22"
-      },
-      {
-       "pdf": "a-number-23",
-       "box": "a-number-23"
-      },
-      {
-       "pdf": "a-number-24",
-       "box": "a-number-24"
-      },
-      {
-       "pdf": "a-number-25",
-       "box": "a-number-25"
-      },
-      {
-       "pdf": "a-number-26",
-       "box": "a-number-26"
-      },
-      {
-       "pdf": "a-number-27",
-       "box": "a-number-27"
-      },
-      {
-       "pdf": "a-number-3",
-       "box": "a-number-3"
-      },
-      {
-       "pdf": "a-number-4",
-       "box": "a-number-4"
-      },
-      {
-       "pdf": "a-number-5",
-       "box": "a-number-5"
-      },
-      {
-       "pdf": "a-number-6",
-       "box": "a-number-6"
-      },
-      {
-       "pdf": "a-number-7",
-       "box": "a-number-7"
-      },
-      {
-       "pdf": "a-number-8",
-       "box": "a-number-8"
-      },
-      {
-       "pdf": "a-number-9",
-       "box": "a-number-9"
-      },
-      {
-       "pdf": "current_flr",
-       "box": "current_flr"
-      },
-      {
-       "pdf": "outside_prior_number",
-       "box": "outside_prior_number"
-      },
-      {
-       "pdf": "outside_prior_zip",
-       "box": "outside_prior_zip"
-      }
-     ]
-    },
     {
      "label": "16. Have you ever been issued an “alien crewman” visa?",
      "fields": [
@@ -479,40 +283,8 @@
        "box": "1. Physical Address — Is this your current mailing address? — Yes"
       },
       {
-       "pdf": "physical_apt",
-       "box": "Apartment"
-      },
-      {
-       "pdf": "physical_city",
-       "box": "City or Town"
-      },
-      {
        "pdf": "physical_incare_of_name",
        "box": "In Care Of Name"
-      },
-      {
-       "pdf": "physical_number",
-       "box": "Number"
-      },
-      {
-       "pdf": "physical_reside_date",
-       "box": "Date You First Resided at This Address"
-      },
-      {
-       "pdf": "physical_state",
-       "box": "State"
-      },
-      {
-       "pdf": "physical_ste",
-       "box": "Suite"
-      },
-      {
-       "pdf": "physical_street",
-       "box": "Street Number and Name"
-      },
-      {
-       "pdf": "physical_zip",
-       "box": "ZIP Code"
       }
      ]
     },
@@ -639,6 +411,19 @@
      ]
     },
     {
+     "label": "（表上无单独题面）",
+     "fields": [
+      {
+       "pdf": "outside_prior_number",
+       "box": "outside_prior_number"
+      },
+      {
+       "pdf": "outside_prior_zip",
+       "box": "outside_prior_zip"
+      }
+     ]
+    },
+    {
      "label": "10. Recent Immigration History",
      "fields": [
       {
@@ -667,60 +452,8 @@
      "label": "Prior Address",
      "fields": [
       {
-       "pdf": "prior_apt",
-       "box": "Prior Address — Apt. / Ste. / Flr. — Apt."
-      },
-      {
-       "pdf": "prior_city",
-       "box": "Prior Address — City or Town"
-      },
-      {
-       "pdf": "prior_country",
-       "box": "Prior Address — Country"
-      },
-      {
-       "pdf": "prior_flr",
-       "box": "Prior Address — Apt. / Ste. / Flr. — Flr."
-      },
-      {
        "pdf": "prior_incare_of_name",
        "box": "Prior Address — In Care Of Name (if any)"
-      },
-      {
-       "pdf": "prior_number",
-       "box": "Prior Address — Number"
-      },
-      {
-       "pdf": "prior_postal",
-       "box": "Prior Address — Postal Code"
-      },
-      {
-       "pdf": "prior_province",
-       "box": "Prior Address — Province"
-      },
-      {
-       "pdf": "prior_reside_date_from",
-       "box": "Prior Address — Dates of Residence: From"
-      },
-      {
-       "pdf": "prior_reside_date_to",
-       "box": "Prior Address — Dates of Residence: To"
-      },
-      {
-       "pdf": "prior_state",
-       "box": "Prior Address — State"
-      },
-      {
-       "pdf": "prior_ste",
-       "box": "Prior Address — Apt. / Ste. / Flr. — Ste."
-      },
-      {
-       "pdf": "prior_street",
-       "box": "Prior Address — Street Number and Name"
-      },
-      {
-       "pdf": "prior_zip",
-       "box": "Prior Address — ZIP Code"
       }
      ]
     },
@@ -783,24 +516,6 @@
       {
        "pdf": "recent_zip",
        "box": "Most Recent Address Outside the United States (optional) — ZIP Code"
-      }
-     ]
-    },
-    {
-     "label": "Have you resided at your current address for at least 5 years? — No",
-     "fields": [
-      {
-       "pdf": "residing_address_no",
-       "box": "Have you resided at your current address for at least 5 years? — No"
-      }
-     ]
-    },
-    {
-     "label": "Have you resided at your current address for at least 5 years? — Yes",
-     "fields": [
-      {
-       "pdf": "residing_address_yes",
-       "box": "Have you resided at your current address for at least 5 years? — Yes"
       }
      ]
     },
@@ -1405,39 +1120,6 @@
    ]
   },
   {
-   "id": "biographic-info",
-   "no": 8,
-   "title": "Part 8 · 生物信息（族裔 / 身高 / 眼睛头发颜色）",
-   "count": 3,
-   "cats": [
-    "体重"
-   ],
-   "fields": [
-    "weight_1",
-    "weight_2",
-    "weight_3"
-   ],
-   "groups": [
-    {
-     "label": "Weight（体重，3 个小格）",
-     "fields": [
-      {
-       "pdf": "weight_1",
-       "box": "weight_1"
-      },
-      {
-       "pdf": "weight_2",
-       "box": "weight_2"
-      },
-      {
-       "pdf": "weight_3",
-       "box": "weight_3"
-      }
-     ]
-    }
-   ]
-  },
-  {
    "id": "9d",
    "no": 9,
    "title": "Part 9 · 公共负担（Public Charge，Items 56–64）",
@@ -1706,47 +1388,15 @@
    "id": "additional-info-page",
    "no": 14,
    "title": "Part 14 · 附加信息续页（Additional Information）",
-   "count": 76,
+   "count": 12,
    "cats": [
     "续页空白行"
    ],
    "fields": [
-    "additional_info_description_1",
-    "additional_info_description_10",
-    "additional_info_description_11",
-    "additional_info_description_12",
-    "additional_info_description_13",
-    "additional_info_description_14",
-    "additional_info_description_15",
-    "additional_info_description_16",
-    "additional_info_description_2",
-    "additional_info_description_3",
-    "additional_info_description_4",
-    "additional_info_description_5",
-    "additional_info_description_6",
-    "additional_info_description_7",
-    "additional_info_description_8",
-    "additional_info_description_9",
     "additional_info_givenname_1",
     "additional_info_givenname_2",
     "additional_info_givenname_3",
     "additional_info_givenname_4",
-    "additional_info_itno_1",
-    "additional_info_itno_10",
-    "additional_info_itno_11",
-    "additional_info_itno_12",
-    "additional_info_itno_13",
-    "additional_info_itno_14",
-    "additional_info_itno_15",
-    "additional_info_itno_16",
-    "additional_info_itno_2",
-    "additional_info_itno_3",
-    "additional_info_itno_4",
-    "additional_info_itno_5",
-    "additional_info_itno_6",
-    "additional_info_itno_7",
-    "additional_info_itno_8",
-    "additional_info_itno_9",
     "additional_info_lastname_1",
     "additional_info_lastname_2",
     "additional_info_lastname_3",
@@ -1754,108 +1404,12 @@
     "additional_info_middlename_1",
     "additional_info_middlename_2",
     "additional_info_middlename_3",
-    "additional_info_middlename_4",
-    "additional_info_pgno_1",
-    "additional_info_pgno_10",
-    "additional_info_pgno_11",
-    "additional_info_pgno_12",
-    "additional_info_pgno_13",
-    "additional_info_pgno_14",
-    "additional_info_pgno_15",
-    "additional_info_pgno_16",
-    "additional_info_pgno_2",
-    "additional_info_pgno_3",
-    "additional_info_pgno_4",
-    "additional_info_pgno_5",
-    "additional_info_pgno_6",
-    "additional_info_pgno_7",
-    "additional_info_pgno_8",
-    "additional_info_pgno_9",
-    "additional_info_ptno_1",
-    "additional_info_ptno_10",
-    "additional_info_ptno_11",
-    "additional_info_ptno_12",
-    "additional_info_ptno_13",
-    "additional_info_ptno_14",
-    "additional_info_ptno_15",
-    "additional_info_ptno_16",
-    "additional_info_ptno_2",
-    "additional_info_ptno_3",
-    "additional_info_ptno_4",
-    "additional_info_ptno_5",
-    "additional_info_ptno_6",
-    "additional_info_ptno_7",
-    "additional_info_ptno_8",
-    "additional_info_ptno_9"
+    "additional_info_middlename_4"
    ],
    "groups": [
     {
      "label": "续页空白行（Page / Part / Item / Description，写不下时才用）",
      "fields": [
-      {
-       "pdf": "additional_info_description_1",
-       "box": "additional_info_description_1"
-      },
-      {
-       "pdf": "additional_info_description_10",
-       "box": "additional_info_description_10"
-      },
-      {
-       "pdf": "additional_info_description_11",
-       "box": "additional_info_description_11"
-      },
-      {
-       "pdf": "additional_info_description_12",
-       "box": "additional_info_description_12"
-      },
-      {
-       "pdf": "additional_info_description_13",
-       "box": "additional_info_description_13"
-      },
-      {
-       "pdf": "additional_info_description_14",
-       "box": "additional_info_description_14"
-      },
-      {
-       "pdf": "additional_info_description_15",
-       "box": "additional_info_description_15"
-      },
-      {
-       "pdf": "additional_info_description_16",
-       "box": "additional_info_description_16"
-      },
-      {
-       "pdf": "additional_info_description_2",
-       "box": "additional_info_description_2"
-      },
-      {
-       "pdf": "additional_info_description_3",
-       "box": "additional_info_description_3"
-      },
-      {
-       "pdf": "additional_info_description_4",
-       "box": "additional_info_description_4"
-      },
-      {
-       "pdf": "additional_info_description_5",
-       "box": "additional_info_description_5"
-      },
-      {
-       "pdf": "additional_info_description_6",
-       "box": "additional_info_description_6"
-      },
-      {
-       "pdf": "additional_info_description_7",
-       "box": "additional_info_description_7"
-      },
-      {
-       "pdf": "additional_info_description_8",
-       "box": "additional_info_description_8"
-      },
-      {
-       "pdf": "additional_info_description_9",
-       "box": "additional_info_description_9"
-      },
       {
        "pdf": "additional_info_givenname_1",
        "box": "additional_info_givenname_1"
@@ -1871,70 +1425,6 @@
       {
        "pdf": "additional_info_givenname_4",
        "box": "additional_info_givenname_4"
-      },
-      {
-       "pdf": "additional_info_itno_1",
-       "box": "additional_info_itno_1"
-      },
-      {
-       "pdf": "additional_info_itno_10",
-       "box": "additional_info_itno_10"
-      },
-      {
-       "pdf": "additional_info_itno_11",
-       "box": "additional_info_itno_11"
-      },
-      {
-       "pdf": "additional_info_itno_12",
-       "box": "additional_info_itno_12"
-      },
-      {
-       "pdf": "additional_info_itno_13",
-       "box": "additional_info_itno_13"
-      },
-      {
-       "pdf": "additional_info_itno_14",
-       "box": "additional_info_itno_14"
-      },
-      {
-       "pdf": "additional_info_itno_15",
-       "box": "additional_info_itno_15"
-      },
-      {
-       "pdf": "additional_info_itno_16",
-       "box": "additional_info_itno_16"
-      },
-      {
-       "pdf": "additional_info_itno_2",
-       "box": "additional_info_itno_2"
-      },
-      {
-       "pdf": "additional_info_itno_3",
-       "box": "additional_info_itno_3"
-      },
-      {
-       "pdf": "additional_info_itno_4",
-       "box": "additional_info_itno_4"
-      },
-      {
-       "pdf": "additional_info_itno_5",
-       "box": "additional_info_itno_5"
-      },
-      {
-       "pdf": "additional_info_itno_6",
-       "box": "additional_info_itno_6"
-      },
-      {
-       "pdf": "additional_info_itno_7",
-       "box": "additional_info_itno_7"
-      },
-      {
-       "pdf": "additional_info_itno_8",
-       "box": "additional_info_itno_8"
-      },
-      {
-       "pdf": "additional_info_itno_9",
-       "box": "additional_info_itno_9"
       },
       {
        "pdf": "additional_info_lastname_1",
@@ -1967,134 +1457,6 @@
       {
        "pdf": "additional_info_middlename_4",
        "box": "additional_info_middlename_4"
-      },
-      {
-       "pdf": "additional_info_pgno_1",
-       "box": "additional_info_pgno_1"
-      },
-      {
-       "pdf": "additional_info_pgno_10",
-       "box": "additional_info_pgno_10"
-      },
-      {
-       "pdf": "additional_info_pgno_11",
-       "box": "additional_info_pgno_11"
-      },
-      {
-       "pdf": "additional_info_pgno_12",
-       "box": "additional_info_pgno_12"
-      },
-      {
-       "pdf": "additional_info_pgno_13",
-       "box": "additional_info_pgno_13"
-      },
-      {
-       "pdf": "additional_info_pgno_14",
-       "box": "additional_info_pgno_14"
-      },
-      {
-       "pdf": "additional_info_pgno_15",
-       "box": "additional_info_pgno_15"
-      },
-      {
-       "pdf": "additional_info_pgno_16",
-       "box": "additional_info_pgno_16"
-      },
-      {
-       "pdf": "additional_info_pgno_2",
-       "box": "additional_info_pgno_2"
-      },
-      {
-       "pdf": "additional_info_pgno_3",
-       "box": "additional_info_pgno_3"
-      },
-      {
-       "pdf": "additional_info_pgno_4",
-       "box": "additional_info_pgno_4"
-      },
-      {
-       "pdf": "additional_info_pgno_5",
-       "box": "additional_info_pgno_5"
-      },
-      {
-       "pdf": "additional_info_pgno_6",
-       "box": "additional_info_pgno_6"
-      },
-      {
-       "pdf": "additional_info_pgno_7",
-       "box": "additional_info_pgno_7"
-      },
-      {
-       "pdf": "additional_info_pgno_8",
-       "box": "additional_info_pgno_8"
-      },
-      {
-       "pdf": "additional_info_pgno_9",
-       "box": "additional_info_pgno_9"
-      },
-      {
-       "pdf": "additional_info_ptno_1",
-       "box": "additional_info_ptno_1"
-      },
-      {
-       "pdf": "additional_info_ptno_10",
-       "box": "additional_info_ptno_10"
-      },
-      {
-       "pdf": "additional_info_ptno_11",
-       "box": "additional_info_ptno_11"
-      },
-      {
-       "pdf": "additional_info_ptno_12",
-       "box": "additional_info_ptno_12"
-      },
-      {
-       "pdf": "additional_info_ptno_13",
-       "box": "additional_info_ptno_13"
-      },
-      {
-       "pdf": "additional_info_ptno_14",
-       "box": "additional_info_ptno_14"
-      },
-      {
-       "pdf": "additional_info_ptno_15",
-       "box": "additional_info_ptno_15"
-      },
-      {
-       "pdf": "additional_info_ptno_16",
-       "box": "additional_info_ptno_16"
-      },
-      {
-       "pdf": "additional_info_ptno_2",
-       "box": "additional_info_ptno_2"
-      },
-      {
-       "pdf": "additional_info_ptno_3",
-       "box": "additional_info_ptno_3"
-      },
-      {
-       "pdf": "additional_info_ptno_4",
-       "box": "additional_info_ptno_4"
-      },
-      {
-       "pdf": "additional_info_ptno_5",
-       "box": "additional_info_ptno_5"
-      },
-      {
-       "pdf": "additional_info_ptno_6",
-       "box": "additional_info_ptno_6"
-      },
-      {
-       "pdf": "additional_info_ptno_7",
-       "box": "additional_info_ptno_7"
-      },
-      {
-       "pdf": "additional_info_ptno_8",
-       "box": "additional_info_ptno_8"
-      },
-      {
-       "pdf": "additional_info_ptno_9",
-       "box": "additional_info_ptno_9"
       }
      ]
     }

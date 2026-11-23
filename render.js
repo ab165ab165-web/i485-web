@@ -22,7 +22,7 @@
      冻结防止任何一处顺手往里加键 → 渲染层/写入层口径分叉。 */
   var LIMIT_FIELDS = Object.freeze({ priorspouse_country_birth: 1, priorspouse_nationality: 1 });
   var LIVE_WARN_TEXT = '这题答「是」要在 Part 9 另写一段解释。不用重填，答完统一给你清单。';
-  var COND_NOTE = '这题只在前面某些答案成立时出现（条件题）。如果上一个问题答案改了，这题可能自动消失。';
+  var COND_NOTE = '这题只在前面某些答案成立时出现（条件题）。前面的答案改了，这题可能自动消失。';
 
   function isGate(q) { return !!q.noPdf; }
   function isNoneOpt(o) {
@@ -62,22 +62,39 @@
     return escText(s).replace(/"/g, '&quot;');
   }
 
-  /* ---------- 背景大数字（v9 批 5） ----------
+  /* ---------- 背景大数字（v9 批 5 建 / 2026-11-11 定稿回退修复） ----------
    * mockup 真相源 = .shots/art-directions/{A-文书质感,B-冷静工具,C-暖纸朱红}.html
    *   <div class="numeral" aria-hidden="true">01</div>
-   * 值的口径：该题在**整套题库**里的序号（1 起）补零到两位；
-   * 超过 99 不补零（保持 String(n) 语义：100 → "100"，173 → "173"）。
-   * 序号按题库固定，不随条件题的可见性增减而变（同一题永远同一个号）。 */
+   *
+   * 【口径 · 2026-11-11 老板定稿，本批修复回退】
+   *   数字 = **官方 Item 号**（读 q.item），不是题库序号，也不是跨 Part 连续顺排。
+   *   v10–v13 题库重建时曾被回退成「题库序号补零两位」（01…409），
+   *   老板在手机上看到「Part 1 Item 18」那题背景显示 12 而不是 18，本批改回。
+   *
+   * 归一化规则：
+   *   · "4 续" / "8 续" → 只显示 "4" / "8"（官方表这两行没有独立编号，
+   *     「续」是页面上补的说明字，不进水印）。
+   *   · item 为空的题 → 返回 ''（调用点据此**整个 .numeral 节点不输出**），
+   *     宁可不显示，不编一个占位号。
+   *   · 不补零：3 就显示 3。
+   *
+   * 目录/TOC 的编号是另一套逻辑（段内可见题序号），不在本函数内，不要动。 */
   function questionNumber(q) {
-    var MODEL = root.I485_QUESTIONS;
-    if (!MODEL || !MODEL.questions || !MODEL.questions.length) return '';
-    for (var i = 0; i < MODEL.questions.length; i++) {
-      if (MODEL.questions[i].id === q.id) {
-        var n = String(i + 1);
-        return n.length < 2 ? '0' + n : n;
-      }
-    }
-    return '';
+    if (!q) return '';
+    var raw = q.item == null ? '' : String(q.item);
+    /* 去「续」后缀（只去结尾的「续」，中间的空格一并清掉） */
+    var s = raw.replace(/\s*续\s*$/, '').trim();
+    return s;
+  }
+
+  /* 水印字号按字符数缩（沿用 2026-11-11 口径）：
+   *   1–2 字符 → 皮肤原字号（--t-numeral-size）
+   *   3 字符   → ×0.66
+   *   4 字符   → ×0.52
+   * 缩放系数写进 .numeral 的 data-len，CSS 用属性选择器生效，
+   * --t-numeral-* token 全部保留（见 style.css）。 */
+  function numeralLen(text) {
+    return String(text == null ? '' : text).length;
   }
 
   /* ---------- 选项 ---------- */
@@ -132,10 +149,18 @@
           out.push('<option value="' + escAttr(op.value) + '">' + escText(op.text || op.value) + '</option>');
         });
         out.push('</select>');
+      } else if (inp.multiline) {
+        /* 多行框（第 62 项「一行写一项」）：写 PDF 时 core 把换行合并成「; 」，内容不丢。
+           rows=4 保证手机上一屏看得见几项全文，不再只露句尾。 */
+        out.push('<textarea rows="4" class="multi" autocomplete="off" spellcheck="false"');
+        if (inp.placeholder) out.push(' placeholder="' + escAttr(inp.placeholder) + '"');
+        out.push('></textarea>');
       } else {
         var type = inp.type === 'date' ? 'date' : (inp.type === 'number' ? 'number' : 'text');
         out.push('<input type="' + type + '"');
         if (inp.placeholder) out.push(' placeholder="' + escAttr(inp.placeholder) + '"');
+        /* 手机上给数字键盘（A-Number 这类只收数字的格子） */
+        if (inp.inputmode) out.push(' inputmode="' + escAttr(inp.inputmode) + '"');
         out.push(' autocomplete="off" spellcheck="false"');
         if (type === 'text' && LIMIT_FIELDS[inp.pdf]) out.push(' data-pdf="' + escAttr(inp.pdf) + '"');
         out.push('>');
@@ -144,7 +169,10 @@
       if (inp.type !== 'select' || !(inp.options && inp.options.length)) {
         var type2 = inp.type === 'date' ? 'date' : (inp.type === 'number' ? 'number' : 'text');
         /* 常驻提示：PDF 只认拉丁字符 */
-        if (type2 === 'text') out.push('<div class="sub">请用英文或拼音填写</div>');
+        if (type2 === 'text') {
+          out.push('<div class="sub">请用英文或拼音填写' +
+            (inp.multiline ? '；写进 PDF 时每行之间用分号隔开' : '') + '</div>');
+        }
         /* 9 字符国名格：题内当场判断（初始隐藏，app.js 按已有答案回填） */
         if (type2 === 'text' && LIMIT_FIELDS[inp.pdf]) out.push('<div class="sub limitmsg" hidden=""></div>');
         if (type2 === 'date') {
@@ -174,8 +202,14 @@
     /* 背景大数字放在**最后**：app.js 按 kids[0] 取选项容器、
        按 class 取 field / uncertain-btn，数字节点插在前面会把下标打乱。
        位置无影响 —— 它是绝对定位（相对题卡），DOM 顺序只影响同层绘制次序，
-       而内容层 z-index:1 恒在它之上。 */
-    out.push('<div class="numeral" aria-hidden="true">' + questionNumber(q) + '</div>');
+       而内容层 z-index:1 恒在它之上。
+       2026-11-11 定稿：数字 = 官方 Item 号；item 为空的题**整个节点不输出**
+       （不是输出空字符串 —— 空 div 仍会占位、也仍会被选中）。 */
+    var numText = questionNumber(q);
+    if (numText) {
+      out.push('<div class="numeral" aria-hidden="true" data-len="' + numeralLen(numText) + '">' +
+        escText(numText) + '</div>');
+    }
     return out.join('');
   }
 

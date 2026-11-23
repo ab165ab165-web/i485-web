@@ -69,11 +69,11 @@ if (location.protocol === 'http:' || location.protocol === 'https:') { var l = d
   <section id="view-intro" class="view">
     <div class="card intro-card">
       <h1>I-485 问卷式填写工具</h1>
-      <p class="lead">把 I-485 翻成中文问卷，一屏一题问完，直接导出填好的表格。导出后你把 Part 1 和姓名地址这些格子自己补上就齐了。</p>
+      <p class="lead">把 I-485 翻成中文问卷，一屏一题问完，直接导出填好的表格。导出后你把姓名、SSN、护照号这些格子自己补上就齐了。</p>
       <!-- 开始页两行小字（2026-11-11）：隐私口径，一句一行。
            纯说明文字，普通 <p> 给屏幕阅读器读；文案逐字定稿，不许改写。 -->
       <div class="intro-notes">
-        <p>只问选择题，姓名和 SSN 不会出现</p>
+        <p>姓名、A-Number、SSN 不问</p>
         <p>答案只存在你的浏览器里，不上传</p>
       </div>
       <div class="intro-actions">
@@ -160,6 +160,9 @@ if (location.protocol === 'http:' || location.protocol === 'https:') { var l = d
       <p class="tiny" id="pdfStatus"></p>
       <p class="tiny" id="instrStatus"></p>
       <div id="pdfNotes"></div>
+      <!-- 附加白纸（v12）：住址超过表上 18 条容量时才由 app.js 往里挂「说明 + 打印按钮」，
+           无溢出时这个挂载点保持空且 hidden（DOM 里不出现按钮/区块）。 -->
+      <div id="extraSheetSlot" hidden></div>
       <div id="doneGuide" class="guide-box">
         <h2 id="guideTitle">拿到 PDF 之后怎么走</h2>
         <ol class="guide">
@@ -169,7 +172,7 @@ if (location.protocol === 'http:' || location.protocol === 'https:') { var l = d
           </li>
           <li id="guideStep2">
             <b id="guideStep2b">用黑笔补空，别空着交</b>
-            <span id="guideStep2s">姓名、地址、SSN、A-Number、护照/签证号这些格子工具不会填；空着可能被视为未完成。</span>
+            <span id="guideStep2s">姓名、SSN、护照/签证号这些格子工具不会填；空着可能被视为未完成。</span>
           </li>
           <li id="guideStep3">
             <b id="guideStep3b">签名并写当天日期</b>
@@ -183,7 +186,7 @@ if (location.protocol === 'http:' || location.protocol === 'https:') { var l = d
         <p class="tiny guide-note" id="guideNote">寄到哪里、交多少费用，一律以 USCIS 官网 i-485 页面的 Filing 一栏为准：<a href="https://www.uscis.gov/i-485">uscis.gov/i-485</a></p>
         <p class="tiny guide-sign" id="guideSign"><b>签名必须手写，盖章或打字的名字不会被接受。</b></p>
         <h3 class="hw-title">这些格子工具不会填，可以在电脑里直接键入，也可以打印后手写</h3>
-        <p class="tiny" id="hwIntro">其余格子已按你的答案填好，不要覆盖；下面这些格子生成时留空，你可以在 PDF 里直接键入，也可以打印后用黑笔手写。</p>
+        <p class="tiny" id="hwIntro">五年内住过的地址要写全：表上只留一个前住址格，第 2 条起由工具写进 Part 14。其余格子已按你的答案填好，不要覆盖；下面这些格子生成时留空，你可以在 PDF 里直接键入，也可以打印后用黑笔手写。</p>
         <ul class="hwlist" id="hwList"></ul>
       </div>
       <button class="btn ghost big" id="btnBackToResult">回看查验结果</button>
@@ -330,6 +333,27 @@ if (location.protocol === 'http:' || location.protocol === 'https:') { var l = d
         <p class="about-msg" role="status" aria-live="polite"></p>
       </div>
     </details>
+    <!-- 更新说明（v13）：弹层最底下一节，按日期倒序。
+         只放在这个面板里（#aboutIntro 之外的独立节点）——拿表屏 / 目录面板那两份
+         克隆体不带上这一节，弹层短、首屏仍是作者信息在前。
+         文案逐字定稿，不许改写；不写内部版本号 / 文件名 / 英文缩写。 -->
+    <section class="changelog" id="changelog" aria-labelledby="changelogTitle">
+      <h2 class="changelog-title" id="changelogTitle">更新说明</h2>
+      <div class="changelog-body">
+        <div class="changelog-group">
+          <p class="changelog-date">2026-11-15</p>
+          <p class="changelog-item">· 页眉的 A-Number 会一次填到每一页。</p>
+          <p class="changelog-item">· 五年内住过的地址可以逐条填：表上只放两个，剩下的写进 Part 14。</p>
+          <p class="changelog-item">· 加了体重。身高体重也能填厘米和公斤，工具换算成英尺英寸和磅。</p>
+          <p class="changelog-item">· 住址超过 18 条时，可以打印一张附加白纸随表一起交。</p>
+          <p class="changelog-item">· 填写说明里写明五年内的住址要写全。</p>
+        </div>
+        <div class="changelog-group">
+          <p class="changelog-date">2026-11-09</p>
+          <p class="changelog-item">· 导出改成两份 PDF：官方表 27 页 + 一份填写说明。</p>
+        </div>
+      </div>
+    </section>
   </div>
 </div>
 

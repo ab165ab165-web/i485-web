@@ -32,7 +32,10 @@
   MODEL.questions.forEach(function (q, i) { if (!(q.id in BANK_INDEX)) BANK_INDEX[q.id] = i; });
 
   var el = function (id) { return document.getElementById(id); };
-  var ctx = function () { return { answers: state.answers, groups: GROUPS }; };
+  /* 答案上下文：住址段里「住满五年了吗」这一勾由入住日期自动判定（不问卷），
+   * 判定结果必须进入同一份答案，条件题与写入才看得到 —— 所以每次取 ctx 都过一遍
+   * CORE.deriveAnswers（纯函数，不写 state，日期一改判定立刻跟着变）。 */
+  var ctx = function () { return { answers: CORE.deriveAnswers(MODEL, state.answers, new Date()), groups: GROUPS }; };
   var list = function () { return CORE.visibleQuestions(MODEL, ctx()); };
 
   /* ---------------- 存档 ---------------- */
@@ -207,6 +210,9 @@
     /* 切屏时把另一块的旧提示清掉（Y6 串屏的第二道保险） */
     clearOtherIoMsg(name);
     window.scrollTo(0, 0);
+    /* v12：进拿表屏时按当前答案重算附加白纸（导入答案 / 中途导出后进来都不会留旧条目）。
+       无溢出时这个函数把节点清空——DOM 里不会留下按钮或打印纸。 */
+    if (name === 'handoff') renderExtraSheet();
     /* 页脚/底栏的让位随视图变（拿表屏有页脚没底栏，完成页两者都无） */
     fitFooter();
   }
@@ -226,13 +232,18 @@
 
   function computeSegRanges() {
     SEGMENTS.forEach(function (s) {
-      s._start = Infinity; s._count = 0;
+      s._start = Infinity; s._count = 0; s._w = 0;
       MODEL.questions.forEach(function (q, i) {
         if (s.sections.indexOf(q.section) < 0) return;
         if (i < s._start) s._start = i;
         s._count++;
+        /* 进度条小节的宽度按「必答题」（无条件题）分：住址段题库里有 161 题，
+         * 但其中 153 题要住不满五年、且一直答「还有更早的住址」才会逐条出现。
+         * 按题库总数分宽，第 1 段会占掉近一半进度条，看起来像要走很久。 */
+        if (!q.cond) s._w++;
       });
       if (!isFinite(s._start)) s._start = 0;
+      if (!s._w) s._w = 1;
     });
   }
 
@@ -244,11 +255,11 @@
       var d = document.createElement('div');
       d.className = 'seg-chunk';
       d.setAttribute('data-seg', String(s.n));
-      d.setAttribute('title', '第 ' + s.n + ' 段 · ' + s.title + '（' + s._count + ' 题）· 点一下跳到这一段');
+      d.setAttribute('title', '第 ' + s.n + ' 段 · ' + s.title + '（必答 ' + s._w + ' 题）· 点一下跳到这一段');
       d.setAttribute('role', 'button');
       d.setAttribute('tabindex', '0');
       d.setAttribute('aria-label', '跳到第 ' + s.n + ' 段：' + s.title);
-      d.style.flexGrow = String(s._count || 1);
+      d.style.flexGrow = String(s._w || 1);
       d.appendChild(document.createElement('i'));
       /* 2026-11-09：进度条第 N 小节可点 = 跳到第 N 段的第一道当前可见题 */
       d.addEventListener('click', function () { jumpToSeg(s.n); });
@@ -546,10 +557,28 @@
     }
   }
 
+  /* 「已答」只看**当前生效的那一种单位模式**（v13 修 M2）。
+     * 复现过的谎报：填 5 ft / 7 in → 点「我知道多少厘米」→ 厘米留空 → 完成页说已答，
+     * 但 PDF 一格身高都没写（英制格被 skipWhen 让路、公制格是空的）。
+     * 所以：unitChoice 卡只看当前模式的格子；unitFollow 卡（英寸）在公制下
+     * 只认主卡厘米换算成功，自己那格留的旧值不算。 */
+  function unitModeFilter(q) {
+    if (!q || (!q.unitChoice && !q.unitFollow)) return null;
+    return unitModeOf(q);
+  }
   function hasAnswer(q) {
     var answered = (q.options || []).some(function (o) { return state.answers[o.id] === true; });
     if (answered) return true;
+    var mode = unitModeFilter(q);
+    /* v11：跟着换算走的卡（英寸）自己没输入，主卡（厘米）填对了就算已答 */
+    if (q.unitFollow && mode === 'metric') {
+      var src = state.answers[q.unitFollow.inputId];
+      if (typeof src !== 'string' || src.trim() === '') return false;
+      try { return CORE.convertMetric(q.unitFollow.convert, src).ok === true; }
+      catch (e) { return false; }
+    }
     return (q.inputs || []).some(function (i) {
+      if (mode && i.unitMode && i.unitMode !== mode) return false;
       var v = state.answers[i.id];
       return typeof v === 'string' && v.trim() !== '';
     });
@@ -682,7 +711,7 @@
   var pendingPos = 0;
   function showSegCard(seg, pos) {
     pendingPos = pos;
-    state.seenSegs[String(seg.n)] = true;
+    markSegSeen(seg);
     save();
     lastSegN = seg.n;
     /* 进切段过渡卡：横幅直接收掉（不发淡出），并清掉它的分阶段定时器 */
@@ -734,7 +763,9 @@
     if (!total) { el('counter').textContent = '—'; return; }
     if (p > total - 1) p = total - 1;
     if (p < 0) p = 0;
-    el('counter').textContent = '第 ' + (p + 1) + ' 题 / 约 ' + total + ' 题';
+    /* 两段各自不断行（.counter > span）：顶栏窄时在「题」与「/」之间换成两行，数字不被截断。
+       textContent 仍是「第 n 题 / 约 N 题」（数字是本地算的整数，不含用户输入，可直接拼 HTML）。 */
+    el('counter').innerHTML = '<span>第 ' + (p + 1) + ' 题</span> <span>/ 约 ' + total + ' 题</span>';
   }
 
   /* 输入框改字不重绘（重绘会丢焦点），只把顶部计数与本段圆点重算 */
@@ -797,7 +828,7 @@
     var p = partOf(q.section);
     var seg = SEGMENTS[segIndexOf(q.section)] || { n: 1, title: p.title, bg: null, sections: [] };
     /* 第一次进这一段：先插一张过渡卡。看过就不再出现（seenSegs 落盘）。 */
-    if (!skipSegCard && !state.seenSegs[String(seg.n)]) {
+    if (!skipSegCard && !segSeen(seg)) {
       showSegCard(seg, pos);
       return;
     }
@@ -928,6 +959,184 @@
 
     el('btnPrev').disabled = pos === 0;
     el('btnNext').textContent = (pos === l.length - 1) ? '完成' : '下一题';
+
+    /* 单位切换（v11）：题卡上的「英制 / 公制」二选一 + 换算结果行。
+       排版层（render.js）只出静态 HTML，控件与事件在这里补 —— 与选项、不确定按钮同层。 */
+    if (q.unitChoice || q.unitFollow) applyUnits(q);
+  }
+
+  /* ---------------- 单位切换（v11） --------------
+   * 数据侧（build-questions）声明：
+   *   q.unitChoice = { key, altKey, label, labelAlt, convert, inputId }  ← 主卡片（英尺卡 / 体重卡）
+   *   q.unitFollow = { modeKey, convert, inputId }                        ← 跟着换算走的那张（英寸卡）
+   * 口径：界面上「已换算：…」那行与写进 PDF 的数**同一个函数算出来**（CORE.convertMetric），
+   * 没有第二套算法，也就不存在「界面显示 A、PDF 写 B」。 */
+  function unitModeOf(q) {
+    var uc = q.unitChoice || q.unitFollow;
+    var key = uc.key || uc.modeKey;
+    return state.answers[key] === true ? 'metric' : 'imperial';
+  }
+  /* 单位中文名：只用于提示文案（写进 PDF 的是数字，不读这张表） */
+  var UNIT_ZH = { Feet: '英尺', Inches: '英寸', Centimeters: '厘米', Pounds: '磅', Kilograms: '公斤' };
+  function unitZhOf(inp) { return UNIT_ZH[inp.label] || ''; }
+  /* 这一卡当前模式有没有值（空串 / 未填都算空） */
+  function modeHasValue(q, mode) {
+    return (q.inputs || []).some(function (i) {
+      if (i.unitMode !== mode) return false;
+      var v = state.answers[i.id];
+      return typeof v === 'string' && v.trim() !== '';
+    });
+  }
+  /* 另一模式里已经填的原文（含单位），例如「5 英尺 7 英寸」/「68 磅」。
+     英寸那格在另一张卡上，所以按 convert 同名把两张卡的格子一起收。 */
+  function otherModeText(q, mode) {
+    var uc = q.unitChoice || q.unitFollow;
+    var parts = [];
+    list().forEach(function (qq) {
+      var uc2 = qq.unitChoice || qq.unitFollow;
+      if (!uc2 || uc2.convert !== uc.convert) return;
+      (qq.inputs || []).forEach(function (i) {
+        if (i.unitMode !== mode) return;
+        var v = state.answers[i.id];
+        if (typeof v !== 'string' || v.trim() === '') return;
+        parts.push(v.trim() + ' ' + unitZhOf(i));
+      });
+    });
+    return parts.join(' ');
+  }
+  /* 切模式提示：当前模式空、另一模式有值 → 一句中文说清「不算已答、不会写」。 */
+  function modeSwitchNote(q, mode) {
+    if (!q.unitChoice) return '';
+    if (modeHasValue(q, mode)) return '';
+    var other = mode === 'metric' ? 'imperial' : 'metric';
+    var txt = otherModeText(q, other);
+    if (!txt) return '';
+    return '上一模式填的是 ' + txt + '，这一模式还空着；切回来才写进表。';
+  }
+  function bodyFields() {
+    var body = el('qBody');
+    if (!body) return [];
+    return Array.prototype.slice.call(body.children).filter(function (c) {
+      return c.classList && c.classList.contains('field');
+    });
+  }
+  function convLine(split, raw) {
+    var tag = document.createElement('p');
+    tag.className = 'unit-conv';
+    if (raw == null || String(raw).trim() === '') {
+      tag.textContent = '填好数字后，换算结果会显示在这里。';
+      return tag;
+    }
+    var r;
+    try { r = CORE.convertMetric(split, raw); }
+    catch (e) { r = { ok: false, error: String((e && e.message) || e) }; }
+    if (!r.ok) {
+      tag.className = 'unit-conv bad';
+      tag.textContent = r.error;
+    } else {
+      tag.className = 'unit-conv ok';
+      tag.textContent = r.display;
+    }
+    return tag;
+  }
+  function applyUnits(q) {
+    var body = el('qBody');
+    if (!body) return;
+    var fields = bodyFields();
+    var inputs = q.inputs || [];
+    var mode = unitModeOf(q);
+
+    /* 1) 该模式用不到的那一格从 DOM 拿掉（不用 display:none：验收脚本按可见 .field 逐格填，
+          留一个隐藏格子会让下标错位）。写入侧由 skipWhen 让路，两处都不写。 */
+    inputs.forEach(function (inp, i) {
+      if (!inp.unitMode || inp.unitMode === mode) return;
+      var f = fields[i];
+      if (f && f.parentNode) f.parentNode.removeChild(f);
+    });
+
+    /* 2) 跟着换算走的那张卡（英寸）：公制模式下只留一行说明 */
+    if (q.unitFollow) {
+      if (mode !== 'metric') return;
+      var fw = q.unitFollow;
+      var note = document.createElement('p');
+      note.className = 'unit-follow';
+      var src = state.answers[fw.inputId];
+      var r = null;
+      if (typeof src === 'string' && src.trim() !== '') {
+        try { r = CORE.convertMetric(fw.convert, src); } catch (e) { r = null; }
+      }
+      note.textContent = (r && r.ok)
+        ? ('上一题填的是 ' + r.cm + ' 厘米，' + r.display.replace(/^已换算：/, '换算成 ') +
+           '，这一格按换算结果自动写入，不用再选。')
+        : '这一格会按上一题填的厘米自动写入；回去把厘米填好就行。';
+      var first = bodyFields()[0];
+      body.insertBefore(note, first || body.firstChild);
+      return;
+    }
+
+    var uc = q.unitChoice;
+    if (!uc) return;
+
+    /* 3) 二选一（两个等宽按钮，选中的那个高亮） */
+    var sw = document.createElement('div');
+    sw.className = 'unit-switch';
+    sw.setAttribute('role', 'group');
+    sw.setAttribute('aria-label', '按哪种单位填');
+    var opts = [
+      { mode: 'imperial', text: uc.label },
+      { mode: 'metric', text: uc.labelAlt }
+    ];
+    opts.forEach(function (o) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'unit-opt' + (mode === o.mode ? ' on' : '');
+      b.setAttribute('aria-pressed', mode === o.mode ? 'true' : 'false');
+      b.textContent = o.text;
+      b.addEventListener('click', function () {
+        if (mode === o.mode) return;
+        if (o.mode === 'metric') { state.answers[uc.key] = true; delete state.answers[uc.altKey]; }
+        else { state.answers[uc.altKey] = true; delete state.answers[uc.key]; }
+        if (state.uncertain[q.id]) delete state.uncertain[q.id];
+        save();
+        render(state.pos, true);
+      });
+      sw.appendChild(b);
+    });
+    var firstField = bodyFields()[0];
+    body.insertBefore(sw, firstField || body.firstChild);
+
+    /* 3b) 切模式当场说清楚（v13 M2）：当前模式没填、另一模式有值 → 这条卡不能算已答，
+       也不会写进表；提示就摆在切换按钮下面，别让完成页替它谎报。 */
+    var noteText = modeSwitchNote(q, mode);
+    if (noteText) {
+      var modeNote = document.createElement('p');
+      modeNote.className = 'unit-mode-note';
+      modeNote.textContent = noteText;
+      body.insertBefore(modeNote, sw.nextSibling);
+      /* 在当前模式的输入格里一开始打字，提示就撤掉；清空又回来 */
+      var syncNote = function () { modeNote.hidden = modeHasValue(q, mode); };
+      Array.prototype.forEach.call(body.querySelectorAll('input, select'), function (n) {
+        n.addEventListener('input', syncNote);
+        n.addEventListener('change', syncNote);
+      });
+    }
+
+    /* 4) 公制：换算结果行跟在厘米格后面，输入时就更新 */
+    if (mode !== 'metric') return;
+    var idx = -1;
+    inputs.forEach(function (inp, i) { if (inp.id === uc.inputId) idx = i; });
+    var mField = idx >= 0 ? fields[idx] : null;
+    if (!mField) return;
+    var line = convLine(uc.convert, state.answers[uc.inputId]);
+    mField.appendChild(line);
+    var node = mField.querySelector('input');
+    if (node) {
+      node.addEventListener('input', function () {
+        var next = convLine(uc.convert, node.value);
+        line.className = next.className;
+        line.textContent = next.textContent;
+      });
+    }
   }
 
   function choose(q, o) {
@@ -977,9 +1186,9 @@
     var l = list();
     var answered = 0, p9 = 0, p9answered = 0;
     l.forEach(function (q) {
-      var has = !isUncertain(q) &&
-                ((q.options || []).some(function (o) { return state.answers[o.id] === true; }) ||
-                 (q.inputs || []).some(function (i) { return typeof state.answers[i.id] === 'string' && state.answers[i.id].trim() !== ''; }));
+      /* 口径与 hasAnswer() 完全一致（v13 M2）：单位卡只看当前模式，
+         不能在这里另算一套——否则完成页的「已作答」会和卡片状态对不上。 */
+      var has = !isUncertain(q) && hasAnswer(q);
       if (has) answered++;
       if (/^9[a-g]$/.test(q.section)) {
         p9++;
@@ -1138,6 +1347,170 @@
     });
   }
 
+  /* ---------------- 附加白纸（v12） ----------------
+   * 住址条数超过表上容量（1 现住址 + 1 前住址 + Part 14 的 16 行 = 18 条）时，
+   * 更早的住址**不写进 PDF**（A 文件恒 27 页、零插页），改排进一张独立打印纸。
+   * · 条目文字由 CORE.extraSheetEntries 出 —— 与 Part 14 共用 part14RowText，不另写一套格式化；
+   * · 表头 Page/Part/Item 由 CORE.extraSheetMeta 出 —— 与 Part 14 每行写的同源；
+   * · 没有溢出时连节点都不建（不是 display:none），打印视图不会多出空白页。
+   */
+  var EXTRA_SHEET_BLANKS = 2;                                   /* 末尾留给手写的空白块 */
+  /* v13 M3：页脚不再写死「Page 1 of 1」——8 条溢出 + 超长街道实测会出 2 页，
+     写「1 of 1」就是谎报。改成不带数字的说法（brief 选方案①）。 */
+  var EXTRA_SHEET_FOOT = 'This sheet is part of Form I-485 (09/18/26). Additional information sheet — attach it after Part 14.';
+
+  /* A-Number 只在「有且正好 9 位」时预填；答「没有」/位数不对一律留空（与 PDF 写入同一口径）。 */
+  function aNumberForSheet() {
+    var raw = String(state.answers.a_number_digits || '').replace(/[^0-9]/g, '');
+    return raw.length === 9 ? raw : '';
+  }
+
+  function sheetItem(no, lines, blank) {
+    var item = document.createElement('div');
+    item.className = 'es-item' + (blank ? ' es-blank' : '');
+    var num = document.createElement('div');
+    num.className = 'es-no';
+    num.textContent = no + '.';
+    var body = document.createElement('div');
+    body.className = 'es-lines';
+    for (var i = 0; i < lines.length; i++) {
+      if (i) body.appendChild(document.createElement('br'));
+      body.appendChild(document.createTextNode(lines[i]));
+    }
+    item.appendChild(num);
+    item.appendChild(body);
+    return item;
+  }
+
+  /* 白纸文字用的量尺（v13 M3）：canvas 按 Helvetica 12pt 量行宽。
+     Arial / Liberation Sans 与 Helvetica 字宽度量一致，所以这里量出来的就是
+     Part 14 格子里那把尺（CORE.part14Fits）要的数。canvas 不可用时返回 null，
+     交给 core 的保守常数兜底（同一函数，不另写一套判据）。 */
+  var sheetCtx;
+  function sheetMeasure() {
+    if (sheetCtx === undefined) {
+      try {
+        var cv = document.createElement('canvas');
+        sheetCtx = cv.getContext('2d') || null;
+      } catch (e) { sheetCtx = null; }
+    }
+    if (!sheetCtx) return null;
+    return function (line, size) {
+      sheetCtx.font = size + 'px Helvetica, Arial, sans-serif';
+      return sheetCtx.measureText(line).width;
+    };
+  }
+
+  function printExtraSheet() {
+    if (!el('extraSheetPrint')) return;
+    /* 打印作用域只在「这张纸」：body.print-extra 时 @media print 隐掉页面其余部分。
+       正常情况下 window.print() 返回（或 afterprint 触发）后撤掉这个类。 */
+    document.body.classList.add('print-extra');
+    try { window.print(); }
+    finally {
+      setTimeout(function () { document.body.classList.remove('print-extra'); }, 0);
+    }
+  }
+
+  function renderExtraSheet() {
+    var slot = el('extraSheetSlot');
+    if (!slot) return;
+    slot.innerHTML = '';
+    slot.hidden = true;
+    var old = el('extraSheetPrint');
+    if (old && old.parentNode) old.parentNode.removeChild(old);
+
+    var entries = CORE.extraSheetEntries(MODEL, state.answers);
+    if (!entries.length) return;   /* 无溢出：DOM 里不存在这个区块 */
+    var meta = CORE.extraSheetMeta(MODEL);
+    if (!meta) return;
+
+    /* v13 M3：白纸条目也用 Part 14 同一把尺量（CORE.part14Fits）。
+       量出来放不下的条目在纸上会折行、甚至要手写 —— 完成页当场说清，不装看不见。 */
+    var tooLong = entries.filter(function (e) {
+      try { return !CORE.part14Fits(e.text, sheetMeasure()).fits; } catch (err) { return false; }
+    });
+
+    /* 完成页：一行说明 + 一颗按钮（只在溢出时出现，不留灰按钮） */
+    var wrap = document.createElement('div');
+    wrap.className = 'extra-sheet-cta';
+    var lead = document.createElement('p');
+    lead.className = 'tiny';
+    /* 与 B 文件同一句（同一个函数生成），后面再补这次的具体条数 */
+    var INSTR = window.I485Instructions || window.I485Cover;
+    var sheetLines = INSTR && INSTR.part14SheetLines
+      ? INSTR.part14SheetLines(meta)
+      : ['Part 14 只有 16 行；住址超过 18 条时，超出的部分打在随表的附加白纸上，',
+         '白纸注明 Page ' + meta.pgno + ' / Part ' + meta.ptno + ' / Item ' + meta.itno + '，与表一起装订。'];
+    lead.textContent = sheetLines.join('') +
+      '你这次有 ' + entries.length + ' 条：第 ' + entries[0].no + ' 条起的 ' +
+      entries.length + ' 个更早住址排在这张纸上，生成 PDF 时不会写进去。';
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn ghost';
+    btn.id = 'btnPrintExtra';
+    btn.textContent = '打印附加白纸（' + entries.length + ' 条）';
+    btn.addEventListener('click', printExtraSheet);
+    wrap.appendChild(lead);
+    if (tooLong.length) {
+      var tooLongMsg = document.createElement('p');
+      tooLongMsg.className = 'tiny noteWarn';
+      tooLongMsg.id = 'extraSheetTooLong';
+      tooLongMsg.textContent = tooLong.map(function (e) { return '第 ' + e.no + ' 条'; }).join('、') +
+        '太长，白纸上可能要手写。';
+      wrap.appendChild(tooLongMsg);
+    }
+    wrap.appendChild(btn);
+    slot.appendChild(wrap);
+    slot.hidden = false;
+
+    /* 打印纸本体：屏幕上是 display:none，只在打印媒体 + body.print-extra 下出现 */
+    var sheet = document.createElement('section');
+    sheet.id = 'extraSheetPrint';
+
+    var head = document.createElement('h1');
+    head.className = 'es-title';
+    head.textContent = 'Additional Information — Form I-485';
+    sheet.appendChild(head);
+
+    var nameLine = document.createElement('p');
+    nameLine.className = 'es-meta';
+    nameLine.textContent = 'Applicant Name: ______________________________    A-Number: '
+      + (aNumberForSheet() || '____________');
+    sheet.appendChild(nameLine);
+
+    var refLine = document.createElement('p');
+    refLine.className = 'es-meta';
+    refLine.textContent = 'Page ' + meta.pgno + ' · Part ' + meta.ptno + ' · Item ' + meta.itno;
+    sheet.appendChild(refLine);
+
+    var list = document.createElement('div');
+    list.className = 'es-list';
+    entries.forEach(function (e) { list.appendChild(sheetItem(e.no, e.lines, false)); });
+    var nextNo = entries[entries.length - 1].no + 1;
+    for (var b = 0; b < EXTRA_SHEET_BLANKS; b++) {
+      list.appendChild(sheetItem(nextNo + b, [
+        '____________________________________________________________',
+        '____________________________________________________________',
+        'Dates of residence: ____________ to ____________'
+      ], true));
+    }
+    sheet.appendChild(list);
+
+    var foot = document.createElement('p');
+    foot.className = 'es-foot';
+    foot.textContent = EXTRA_SHEET_FOOT;
+    sheet.appendChild(foot);
+    document.body.appendChild(sheet);
+  }
+
+  /* 系统打印框关掉后撤掉打印作用域（部分浏览器不走 window.print() 的 finally 链） */
+  if (typeof window.addEventListener === 'function') {
+    window.addEventListener('afterprint', function () {
+      document.body.classList.remove('print-extra');
+    });
+  }
+
   /* ---------------- 随时导出（2026-11-09）----------------
    * 老板要求：答题途中也能导出，没答的题按「跳过」处理（PDF 里留空）。
    *
@@ -1291,6 +1664,8 @@
     pill('未答的题会保持空白');
     renderHandwrite();
     renderCheck();
+    /* v12：住址溢出时才出现「附加白纸」区块；无溢出时 DOM 里不建任何节点 */
+    renderExtraSheet();
     /* 拿表屏的「中途导出」说明行：只有中途导出才出现，说清这版是半成品。 */
     var note = el('exportNote');
     if (note) {
@@ -1317,10 +1692,13 @@
     /* 手写清单的引子：中途导出时不能说「其余格子已填好」（未答的格子也是空的）。 */
     var hwIntro = el('hwIntro');
     if (hwIntro) {
+      /* v10 批 C：住址提醒与 B 文件同一句 —— 为什么必须写全（表上只留一个前住址格，
+         第 2 条起由工具写进 Part 14）。两句分支都带，中途导出也照说。 */
+      var HW_ADDR = '五年内住过的地址要写全：表上只留一个前住址格，第 2 条起由工具写进 Part 14。';
       hwIntro.textContent = partial
-        ? '你答过的格子已按答案填好，不要覆盖；未答的题目和下面这些格子生成时留空，' +
+        ? HW_ADDR + '你答过的格子已按答案填好，不要覆盖；未答的题目和下面这些格子生成时留空，' +
           '你可以在 PDF 里直接键入，也可以打印后用黑笔手写。'
-        : '其余格子已按你的答案填好，不要覆盖；下面这些格子生成时留空，' +
+        : HW_ADDR + '其余格子已按你的答案填好，不要覆盖；下面这些格子生成时留空，' +
           '你可以在 PDF 里直接键入，也可以打印后用黑笔手写。';
     }
     /* 🔴 拿表屏的两套口径（法正 2026-11-09 复审 D1）：
@@ -1510,7 +1888,36 @@
     }
     var hw = rep.handwrite || [];
     var hwBlocked = hw.filter(function (a) { return a.action === 'blocked'; });
-    var hwTrunc = hw.filter(function (a) { return a.action !== 'blocked'; });
+    var hwOverflow = hw.filter(function (a) { return a.action === 'overflow'; });
+    /* 2026-11-19 字号口径（Courier New 粗体 10pt，放不下按 10→9→8 缩）：
+       toowide = 8pt 仍放不下、这一格整格没写；truncated = 第 62 项 8 条横线写满，后半截没写。 */
+    var hwWide = hw.filter(function (a) { return a.action === 'toowide'; });
+    var hwCut = hw.filter(function (a) { return a.action === 'truncated'; });
+    var hwTrunc = hw.filter(function (a) {
+      return a.action !== 'blocked' && a.action !== 'overflow' && a.action !== 'toowide' && a.action !== 'truncated';
+    });
+    /* Part 14 一行写不下的住址说明（必改 3）：整条不写、在这里逐条告知，不裁字。 */
+    hwOverflow.forEach(function (a) {
+      add('· ' + where(a) + '：这段说明太长，那一格放不下，整条没有写进 PDF。' +
+        '请打印后自己在 Part 14 对应那一行手写。', 'noteWarn');
+    });
+    hwWide.forEach(function (a) {
+      /* reason 要跟实际原因一致（core.layoutText 的两种失败）：
+           'lines' = 行数放不下（按最小 8 号字排也要 N 行，格子里只放得下 M 行）；
+           'width' / 'comb' = 8 号字也放不下宽度（梳齿格还可能是字数超出）。 */
+      if (a.reason === 'lines') {
+        add('· ' + where(a) + '：「' + a.original + '」太长：按最小的 8 号字排也要 ' + a.linesNeeded +
+          ' 行，格子里只放得下 ' + a.rowsAvail + ' 行，没有写进 PDF。' +
+          '请打印后在这一格手写，或改短后重新生成。', 'noteWarn');
+      } else {
+        add('· ' + where(a) + '：「' + a.original + '」太长，这一格用最小的 8 号字也放不下，没有写进 PDF。' +
+          '请打印后在这一格手写，或改短后重新生成。', 'noteWarn');
+      }
+    });
+    hwCut.forEach(function (a) {
+      add('· ' + where(a) + '：格子里 8 条横线已写满（字号已缩到 8 号），后面这段没写进 PDF，' +
+        '请打印后接着手写，或写在 Part 14 附加信息里：「' + a.rest + '」', 'noteWarn');
+    });
     hwBlocked.forEach(function (a) {
       add('· ' + where(a) + '：这一格只容 ' + a.maxLength + ' 个字符，机器认不出你写的国名，所以没有写进去。' +
         '请在 PDF 上手写：国家名用英文短写，例如 China / Taiwan / Macau。', 'noteWarn');
@@ -1521,6 +1928,37 @@
         '建议打印后手写覆盖。', 'noteWarn');
     }
     (rep.errors || []).forEach(function (m) { add('· ' + m, 'noteErr'); });
+    /* 「说明」不是警告：住址段的日期补全、五年判定依据这类陈述事实的句子，
+       用普通小字列在警告之前，不用琥珀色吓人。 */
+    (rep.notes || []).forEach(function (m) { add('· ' + m); });
+    /* 退路字体（report.typeFont = 'non-embedded'）：模板里没找到完整嵌入的 Courier New 粗体，
+       改用现建的 Courier New 粗体字典（宽度全 600）+ Courier-Bold 量宽度，字体程序不嵌入。
+       字形由阅读器替换，可能与官方表自带字有细微出入 —— 说一次，不要默不作声。 */
+    if (rep.typeFont === 'non-embedded') {
+      add('· 这次没能在官方表里找到它自带的打字字体，用的是同名字体的内置退路（字体程序没嵌进 PDF）。' +
+        '字距可能与官方表有细微差别，打印前请目视核对一遍。');
+    }
+    /* 字号缩小（report.fontShrunk）：打字口径是 Courier New 粗体 10 号，放不下按 10→9→8 整档缩。
+       只列实际缩过的格（同一输入写到多格时按输入去重，取最小字号）；
+       第 62 项横线写满的那条上面已说「字号已缩到 8 号」，这里不重复。 */
+    var cutIds = Object.create(null);
+    hwCut.forEach(function (a) { cutIds[a.inputId] = true; });
+    var shrunkOrder = [], shrunkBy = Object.create(null);
+    (rep.fontShrunk || []).forEach(function (s) {
+      var key = s.inputId || s.pdf;
+      if (cutIds[key]) return;
+      if (!shrunkBy[key]) { shrunkOrder.push(key); shrunkBy[key] = s; }
+      else if (s.size < shrunkBy[key].size) shrunkBy[key] = s;
+    });
+    shrunkOrder.forEach(function (k) {
+      var s = shrunkBy[k];
+      add('· ' + where(s) + '：内容较长，这一格的字从 10 号缩到了 ' + s.size + ' 号，内容完整写进了 PDF。');
+    });
+    /* v13：Part 14 写入行数（report.part14Rows 与写入计划同一条循环数出来）。
+       0 行时不说这一句，没溢出的客户不必看无关信息。 */
+    if (rep.part14Rows) {
+      add('· Part 14 写了 ' + rep.part14Rows + ' 行（从第 1 行起），每行 4 格：Page / Part / Item / 说明。');
+    }
     /* 警告必须逐条渲染：否则中文输入被 pdfSafe 丢掉时，页面显示成功、格子却是空的。 */
     (rep.warnings || []).forEach(function (m) { add('· ' + m, 'noteWarn'); });
   }
@@ -1589,7 +2027,8 @@
     var layout = INSTR.buildLayout({
       parts: parts,
       totalFields: (window.I485_HANDWRITE && window.I485_HANDWRITE.totalFields) || 0,
-      uncertainCount: n
+      uncertainCount: n,
+      partRef: CORE.extraSheetMeta(MODEL)      /* Page/Part/Item 与 Part 14 同源 */
     });
     var baseBytes = await loadAssetBytes(INSTR.baseAssetName());
     if (!baseBytes || !baseBytes.length) throw new Error('说明页图片没加载到，请刷新页面后重试。');
@@ -1599,6 +2038,19 @@
     var page = doc.addPage([W, H]);
     var img = await doc.embedPng(baseBytes);
     page.drawImage(img, { x: 0, y: 0, width: W, height: H });
+
+    /* v12：文字层（透明文本，构建期由 Chromium 打好）。整页图保持像素不变，
+       叠上这层后 PDF 才能检索/复制，验收也能用 pdftotext 核对文案。
+       读不到就跳过：宁可没有文字层，也不能让 B 文件生成失败。 */
+    try {
+      var layerBytes = await loadAssetBytes(INSTR.textLayerAssetName());
+      if (layerBytes && layerBytes.length) {
+        var layerDoc = await PDFDocument.load(layerBytes);
+        /* embedPdf 返回的是数组（每个 index 一页）；drawPage 只收单个 PDFEmbeddedPage */
+        var embedded = (await doc.embedPdf(layerDoc, [0]))[0];
+        page.drawPage(embedded, { x: 0, y: 0, width: W, height: H });
+      }
+    } catch (eLayer) { /* 文字层缺失不阻断出文件 */ }
 
     /* 「另有 N 题…」整句：构建期已按 N 烘好一张图，运行时贴对应那张；N=0 不贴。 */
     if (n > 0) {
@@ -1647,6 +2099,7 @@
       /* A 文件 = 官方表 + 填值。零插页：不插页、不删页，页数恒为 27。 */
       var out = await CORE.fillPdf({
         PDFDocument: window.PDFLib.PDFDocument,
+        PDFLib: window.PDFLib,
         pdfBytes: bytes,
         model: MODEL,
         answers: state.answers,
@@ -1667,23 +2120,33 @@
          缩写格数单独统计，并按格子去重（同一格可能先后记两条 adjustment）。 */
       var adjSeen = Object.create(null);
       var blockedN = 0;
+      var hwAll = r.handwrite || [];
+      var wideN = hwAll.filter(function (a) { return a.action === 'toowide'; }).length;
+      var cutN = hwAll.filter(function (a) { return a.action === 'truncated'; }).length;
       (r.adjustments || []).forEach(function (a) {
         if (a.action === 'blocked') { blockedN++; return; }
         adjSeen[a.inputId || a.pdf || (a.item + '|' + a.label + '|' + a.original)] = true;
       });
       var adjN = Object.keys(adjSeen).length;
-      st.textContent = (wN
-        ? '已生成：有 ' + wN + ' 条提示需要你核对（见下面说明）：'
+      /* 主句的「需要核对」条数 = 警告条数 + 真正没写进 PDF 的格数。
+         没写进去的格子（国名认不出 / 太长放不下 / 横线写满）不产生 warnings，
+         旧口径只数 warnings：客户明明有几格是空的，主句却说「0 条提示」、
+         状态行还是普通小字，看上去一切正常。这里一并统计。 */
+      var errN = (r.errors || []).length;
+      var needN = wN + errN + blockedN + wideN + cutN;
+      st.textContent = (needN
+        ? '已生成：有 ' + needN + ' 条提示需要你核对（没写进去的格子也算在内，见下面说明）：'
         : '已生成并开始下载：') +
-        '勾选 ' + r.checked + ' 个、文本 ' + r.text + ' 项、清空 ' + r.unchecked +
-        ' 个未选项；共 ' + Math.round(r.bytes / 1024) + ' KB。' +
+        '勾选 ' + r.checked + ' 个、文本 ' + r.text + ' 项；共 ' + Math.round(r.bytes / 1024) + ' KB。' +
         ((r.errors || []).length ? ' 有 ' + r.errors.length + ' 格没写进去，见下面说明。' : '') +
         (blockedN ? ' 有 ' + blockedN + ' 格国名认不出、没有写进去，见下面说明。' : '') +
+        (wideN ? ' 有 ' + wideN + ' 格内容太长放不下、没有写进去，见下面说明。' : '') +
+        (cutN ? ' 第 62 项横线写满，后半段没写进去，见下面说明。' : '') +
         (adjN ? ' 其中 ' + adjN + ' 格做了缩写，见下面说明。' : '') +
         /* 兜底：Safari 等浏览器可能拦掉「异步后 a.click()」的下载（手势链）。
            静态不可判，所以给一句人话补救路径；不改变下载逻辑。 */
         '没看到下载，就再点一次按钮。';
-      if (wN) st.className = 'tiny noteWarn';
+      if (needN) st.className = 'tiny noteWarn';
     } catch (e) {
       st.className = 'err';
       st.textContent = '生成失败：' + zhError(e);
@@ -2168,6 +2631,8 @@
   el('btnRestart2').addEventListener('click', function () {
     if (!confirm('清空全部答案并从第一题重新开始？')) return;
     wipe(); save(); render(0);
+    /* 答案清空后白纸不该留在 DOM 里（上次溢出的条目已经作废） */
+    renderExtraSheet();
   });
 
   document.addEventListener('keydown', function (e) {
@@ -2191,8 +2656,32 @@
   function clampResumePos() {
     var l = list();
     if (!l.length) return 0;
+    /* 法正必改 5：旧存档的 pos 是「当时的第几题」，住址段插到最前面后下标整体平移，
+       停在错的题上（题面不对、已答的选项也不显示）。
+       题 id 是内容派生的（section + 选项/输入键），跨版本稳定 —— 先按 currentId 找，
+       找不到（题被删了 / 新存档还没写过 id）再回退旧 pos，旧行为不变。 */
+    if (state.currentId) {
+      for (var i = 0; i < l.length; i++) {
+        if (l[i].id === state.currentId) return i;
+      }
+    }
     if (state.pos < 0) return 0;
     return state.pos > l.length - 1 ? l.length - 1 : state.pos;
+  }
+
+  /* 段是否看过：新存档按**段 key**（sections.js 的 'sec2' 这类，跨版本稳定）；
+     旧存档存的是段号（"1"…"9"），继续认。段号会因为插段/调序整体错位，key 不会。 */
+  function segSeen(seg) {
+    if (!seg) return false;
+    var k = seg.key || String(seg.n);
+    return state.seenSegs[k] === true || state.seenSegs[String(seg.n)] === true;
+  }
+  function markSegSeen(seg) {
+    if (!seg) return;
+    var k = seg.key || String(seg.n);
+    state.seenSegs[k] = true;
+    /* 只留一个键：同段的旧段号键顺手清掉，不让两套口径长期并存 */
+    if (k !== String(seg.n)) delete state.seenSegs[String(seg.n)];
   }
 
   (function boot() {
@@ -2246,6 +2735,8 @@
         /* 验收钩子：随时导出（中途导出） */
         exportAnytime: exportAnytime,
         unansweredCount: unansweredCount,
+        /* 验收钩子（v13 M2）：直接问 hasAnswer —— 单位卡口径与完成页、进度计数同一函数 */
+        hasAnswer: hasAnswer,
         partialExport: function () { return partialExport; },
         /* 验收钩子：导出三选项面板（v9 批 9） */
         openExp: openExp,
